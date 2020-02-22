@@ -15,8 +15,12 @@ wget https://github.com/GaHoKwan/tvpanel/archive/master.zip && unzip master.zip
 ```bash
 mysql -u帐号 -p密码 数据库名 < 数据库.sql
 ```
-- 修改config.php
+- 创建配置文件
 ```bash
+cp .config.php config.php
+
+- 修改配置文件
+```
 define("APPS_APPNAME",""); //客户端软件名
 define("APPS_PACKAGENAME",""); //客户端软件包名
 define("PANEL_MD5_KEY","");  //面板密码MD5加密秘钥
