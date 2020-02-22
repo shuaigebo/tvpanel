@@ -4,8 +4,8 @@ ini_set("error_reporting","E_ALL & ~E_NOTICE");
 session_start();
 include_once "../config.php";
 if(!empty($_POST['username'])&& !empty($_POST['password'])){
-    $user=mysqli_real_escape_string($con,$_POST['username']);
-    $psw=mysqli_real_escape_string($con,$_POST['password']);
+    $user=mysqli_real_escape_string($GLOBALS['conn'],$_POST['username']);
+    $psw=mysqli_real_escape_string($GLOBALS['conn'],$_POST['password']);
     $psw=md5("tvkey_".$psw);
     $result=mysqli_query($GLOBALS['conn'],"select * from chzb_admin where name='$user'");
     if($row=mysqli_fetch_array($result)){
@@ -63,7 +63,7 @@ if(isset($_COOKIE['rememberpass'])){
 	}
 	unset($row);
 	mysqli_free_result($result);
-	mysqli_close($con);
+	mysqli_close($GLOBALS['conn']);
 }
 
 /**

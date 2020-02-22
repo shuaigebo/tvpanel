@@ -18,9 +18,9 @@ a#topnav_current { color: #fff }
 	<nav id="topnav">
 		<ul>
 			<a href="sysadmin.php">系统</a>
-			<?php if($_SESSION['author1']!=0)echo '<a href="useradmin0.php">授权</a>';
-			if($_SESSION['author2']!=0)echo '<a href="useradmin1.php">账号</a>';
-			if($_SESSION['useradmin']!=0)echo '<a href="useradmin2.php">用户</a>';
+			<?php if($_SESSION['useradmin0']!=0)echo '<a href="useradmin0.php">授权</a>';
+			if($_SESSION['useradmin1']!=0)echo '<a href="useradmin1.php">账号</a>';
+			if($_SESSION['useradmin2']!=0)echo '<a href="useradmin2.php">用户</a>';
 			if($_SESSION['ipcheck']!=0)echo '<a href="ipcheck.php">异常</a>';
 			if($_SESSION['epgadmin']!=0)echo '<a href="epgadmin.php">EPG列表</a>';
 			if($_SESSION['channeladmin']!=0)echo '<a href="channeladmin.php">频道列表</a>'; ?>
