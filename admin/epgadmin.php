@@ -281,20 +281,16 @@ function quanxuan(a){
 <center>
 <table border="1" bordercolor="#a0c6e5" style="border-collapse:collapse;">
     <tr>
-	    <td colspan=11><b>EPG列表</b>&nbsp;&nbsp;
-		    <form method="GET">
-				<input type="text" style="width:100px;" name="keywords" value="<?php echo $keywords;?>">
-				<input type="submit" name="submitsearch" value="搜索">
-			</form>
+	    <td colspan=11><b>EPG列表</b>&nbsp;
+		    <form method="POST" action="?act=add">
+		        来源:<select id="epg" name="epg"> <option value="">请选来源</option><option value="cntv">CCTV官网</option><option value="tvsou">搜视网</option><option value="51zmt">51zmt</option></select>&nbsp;
+                名称:&nbsp;<input type="text" style="width:100px;" name="name">&nbsp; 备注:&nbsp;<input type="text" style="width:100px;" name="remarks">&nbsp;&nbsp;<input type="submit" value="新增">&nbsp;<input type="reset" value="重置">
+            </form>
 			<form method="POST">
 			    <input type="submit" name="bdpd" value="绑定频道" onclick="return confirm('自动绑定频道列表后,如果不准确请手动修改!!!')">
 				<input type="submit" name="qkbd" value="清空绑定" onclick="return confirm('确定要清空绑定的频道列表吗？')">
 			</form>
-		    <form method="post" action="?act=add">
-		        来源:<select id="epg" name="epg"> <option value="">请选来源</option><option value="cntv">CCTV官网</option><option value="tvsou">搜视网</option><option value="51zmt">51zmt</option></select>&nbsp;
-                名称:<input type="text" style="width:100px;" name="name">&nbsp; 备注:<input type="text" style="width:100px;" name="remarks">&nbsp;<input type="submit" value="新增">&nbsp;&nbsp; <input type="reset" value="重置">
-            </form>
-            &nbsp;&nbsp;
+            <br><br>
 		    每页
 			<form method="POST" id="recCounts">
 			<select id="sel" name="recCounts" onchange="submitForm();">			
@@ -334,6 +330,10 @@ function quanxuan(a){
 			<input type="text" name="jumpto" style="text-align: center;" size=2 value="<?php echo $page?>">/
 			<?php echo $pageCount?>
 			<button onclick="submitjump()">跳转</button>
+			</form>
+		    <form method="GET">
+				<input type="text" style="width:100px;" name="keywords" value="<?php echo $keywords;?>">
+				<input type="submit" name="submitsearch" value="搜索">
 			</form>
 		</td>
 	</tr>

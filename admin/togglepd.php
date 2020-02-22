@@ -21,15 +21,15 @@ if(isset($_GET['pdname']) && isset($_GET['cat'])){
 	if($row=mysqli_fetch_array($result)){
 		if($row['enable']==1){
 			mysqli_query($GLOBALS['conn'],"UPDATE $categoryname set enable=0 where name='$pdname'");
-			echo "$pdname 已禁用";
+			echo "<script>alert('$pdname 已禁用');</script>";
 		}else{
 			mysqli_query($GLOBALS['conn'],"UPDATE $categoryname set enable=1 where name='$pdname'");
-			echo "$pdname 已启用";
+			echo "<script>alert('$pdname 已启用');</script>";
 		}
 	}else{
-		echo "$pdname 操作失败！";
+		echo "<script>alert('$pdname 操作失败！');</script>";
 	}
 }else{
-	echo "参数错误";
+	echo "<script>alert('参数错误');</script>";
 }
 ?>

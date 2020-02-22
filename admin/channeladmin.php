@@ -132,8 +132,7 @@ if(isset($_GET['pd'])){
 		$rows=explode("\r\n",$srclist);
 		foreach($rows as $row){	
 			if (strpos($row, ',') !== false){
-				$ipos=strpos($row, ',');			
-				//$arr_row=explode(",",$row);
+				$ipos=strpos($row, ',');	
 				$channelname=substr($row,0,$ipos);
 				$source=substr($row,$ipos+1);
 				if(strpos($source,'#')!==false){
@@ -141,7 +140,6 @@ if(isset($_GET['pd'])){
 					foreach ($sources as $src) {
 						$src2=str_replace("\"", "", $src);
 						$src2=str_replace("\'", "", $src2);
-						//$src2=str_replace(",", "", $src2);
 						$src2=str_replace("}", "", $src2);
 						$src2=str_replace("{", "", $src2);
 						if($channelname!=''&&$src2!=''){
@@ -151,7 +149,6 @@ if(isset($_GET['pd'])){
 				}else{
 					$src2=str_replace("\"", "", $source);
 					$src2=str_replace("\'", "", $src2);
-					//$src2=str_replace(",", "", $src2);
 					$src2=str_replace("}", "", $src2);
 					$src2=str_replace("{", "", $src2);
 					if($channelname!=''&&$src2!=''){
@@ -160,7 +157,7 @@ if(isset($_GET['pd'])){
 				}
 			}
 		}
-		echo"<script>showindex=$showindex;</script>保存成功。";
+		echo"<script>showindex=$showindex;alert('保存成功');</script>。";
 	}
 
 	if(isset($_POST['submit'])&&isset($_POST['category'])){
@@ -168,40 +165,44 @@ if(isset($_GET['pd'])){
 		$cpass=$_POST['cpass'];
 		$maxindex=$_POST['maxindex'];
 		if($category==""){
-			echo "类别名称不能为空！";
-			exit();
-		}
-		$result=mysqli_query($GLOBALS['conn'],"SELECT max(id) from $categoryname");
-		if($row=mysqli_fetch_array($result)){			
-			if($row[0]>0){
-				$numCount=$row[0]+1;
-			}
-		}
-		$sql = "SELECT name FROM $categoryname where name='$category'";
-		$result = mysqli_query($GLOBALS['conn'],$sql);
-		if(mysqli_fetch_array($result)){
-			echo "<script>showindex=$showindex;</script>该栏目已经存在！";
+			echo "<script>alert('类别名称不能为空');</script>";
 		}else{
-			mysqli_query($GLOBALS['conn'],"INSERT INTO $categoryname (id,name,psw) VALUES ($numCount,'$category','$cpass')");
-			$result=mysqli_query($GLOBALS['conn'],"SELECT * from $categoryname");
-			$showindex=mysqli_num_rows($result)-1;
-			echo "<script>showindex=$showindex;</script><font color=red>增加类别$category 成功！</font>";
-			$pd=$category;
+			$result=mysqli_query($GLOBALS['conn'],"SELECT max(id) from $categoryname");
+			if($row=mysqli_fetch_array($result)){			
+				if($row[0]>0){
+					$numCount=$row[0]+1;
+				}
+			}
+			$sql = "SELECT name FROM $categoryname where name='$category'";
+			$result = mysqli_query($GLOBALS['conn'],$sql);
+			if(mysqli_fetch_array($result)){
+				echo "<script>showindex=$showindex;alert('该栏目已经存在');</script>";
+			}else{
+				mysqli_query($GLOBALS['conn'],"INSERT INTO $categoryname (id,name,psw) VALUES ($numCount,'$category','$cpass')");
+				$result=mysqli_query($GLOBALS['conn'],"SELECT * from $categoryname");
+				$showindex=mysqli_num_rows($result)-1;
+				echo "<script>showindex=$showindex;alert('增加类别$category 成功');</script>";
+				$pd=$category;
+			}
 		}
 	}
 
 	if(isset($_POST['submit_deltype'])&&isset($_POST['category'])){
 		$category=$_POST['category'];
 	    $showindex=$_POST['showindex'];
-		$result=mysqli_query($GLOBALS['conn'],"SELECT id from $categoryname where name='$category'");
-		if($row=mysqli_fetch_array($result)){
-			$categoryid=$row[0];
-			mysqli_query($GLOBALS['conn'],"UPDATE $categoryname set id=id-1 where id>$categoryid");
+		if($category==""){
+				echo "<script>alert('类别名称不能为空');</script>";
+		}else{
+			$result=mysqli_query($GLOBALS['conn'],"SELECT id from $categoryname where name='$category'");
+			if($row=mysqli_fetch_array($result)){
+				$categoryid=$row[0];
+				mysqli_query($GLOBALS['conn'],"UPDATE $categoryname set id=id-1 where id>$categoryid");
+			}
+			$sql = "delete from $categoryname where name='$category'";
+			mysqli_query($GLOBALS['conn'],$sql);	
+			mysqli_query($GLOBALS['conn'],"delete from chzb_channels where category='$category'");
+			echo "<script>showindex=$showindex-1;alert('$category 删除成功');</script>";
 		}
-		$sql = "delete from $categoryname where name='$category'";
-		mysqli_query($GLOBALS['conn'],$sql);	
-		mysqli_query($GLOBALS['conn'],"delete from chzb_channels where category='$category'");
-		echo "<script>showindex=$showindex-1;</script>$category 删除成功！";
 	}
 
 	if(isset($_POST['submit_modifytype'])&&isset($_POST['category'])){
@@ -210,13 +211,13 @@ if(isset($_GET['pd'])){
 		$showindex=$_POST['showindex'];
 		$category0=$_POST['typename0'];
 		if($category==""){
-			echo "类别名称不能为空！";
-			exit();
+			echo "<script>alert('类别名称不能为空');</script>";
+		}else{
+			mysqli_query($GLOBALS['conn'],"update $categoryname set name='$category',psw='$cpass' where name='$category0'");
+			mysqli_query($GLOBALS['conn'],"UPDATE chzb_channels set category='$category' where category='$category0'");
+			echo "<script>showindex=$showindex;alert('$category 修改成功');</script>";
+			$pd=$category;
 		}
-		mysqli_query($GLOBALS['conn'],"update $categoryname set name='$category',psw='$cpass' where name='$category0'");
-		mysqli_query($GLOBALS['conn'],"UPDATE chzb_channels set category='$category' where category='$category0'");
-		echo "$category 修改成功！<script>showindex=$showindex;</script>";
-		$pd=$category;
 	}
 
 	if(isset($_POST['submit_moveup'])&&isset($_POST['category'])){
@@ -271,7 +272,7 @@ if(isset($_GET['pd'])){
 			$sql = "update chzb_appdata set dataver=$ver,autoupdate=0";
 			mysqli_query($GLOBALS['conn'],$sql);	
 		}
-		echo "<font color=red>保存成功。</font>";
+		echo "<script>alert('保存成功');</script>";
 	}
 
 	if(isset($_POST['checkpdname'])){ 

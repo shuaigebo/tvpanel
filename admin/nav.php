@@ -5,7 +5,7 @@
 
 <style type="text/css">
 a:link, a:visited { text-decoration: none; color: #000 }
-#topnav { width: 102%; background: #33a996; height: 50px; line-height: 50px; }
+#topnav { width: 100%; background: #33a996; height: 50px; line-height: 50px; }
 #topnav ul { width: 100%; margin: auto }
 #topnav a { display: inline-block; font-size: 18px; font-family: "Microsoft Yahei", Arial, Helvetica, sans-serif; padding: 0 20px; }
 #topnav a:hover { background: #345; color: #fff; border-top: 0px solid #f77825; }
@@ -17,8 +17,8 @@ a#topnav_current { color: #fff }
 <center>
 	<nav id="topnav">
 		<ul>
-			<a href="sysadmin.php">系统</a>
-			<?php if($_SESSION['useradmin0']!=0)echo '<a href="useradmin0.php">授权</a>';
+			<?php if($user =='admin')echo '<a href="sysadmin.php">系统</a>';
+			if($_SESSION['useradmin0']!=0)echo '<a href="useradmin0.php">授权</a>';
 			if($_SESSION['useradmin1']!=0)echo '<a href="useradmin1.php">账号</a>';
 			if($_SESSION['useradmin2']!=0)echo '<a href="useradmin2.php">用户</a>';
 			if($_SESSION['ipcheck']!=0)echo '<a href="ipcheck.php">异常</a>';
