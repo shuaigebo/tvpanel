@@ -1,7 +1,7 @@
 <script>
-  var leftbgColor='#112233';
-  var showindex=0;
-  var maxindex=0;
+	var leftbgColor='#112233';
+	var showindex=0;
+	var maxindex=0;
 </script>
 <?php
 
@@ -24,6 +24,7 @@ function echoJSON($category){
 		}	
 		$sourceArray[$row['name']][]=$row['url'];
 	}
+	unset($row);
 	mysqli_free_result($result);
 	$objCategory=(Object)null;
 	$objChannel=(Object)null;
@@ -34,6 +35,7 @@ function echoJSON($category){
 		$channelArray[]=$objChannel;
 	}
 	$objCategory->$category=$channelArray;
+	unset($nameArray,$sourceArray);
 	return $objCategory;
 }
 
@@ -41,25 +43,25 @@ function echoJSON($category){
 
 <script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
 <script>
-  (function($){$.session={_id:null,_cookieCache:undefined,_init:function()
-  {if(!window.name){window.name=Math.random();}
-  this._id=window.name;this._initCache();var matches=(new RegExp(this._generatePrefix()+"=([^;]+);")).exec(document.cookie);if(matches&&document.location.protocol!==matches[1]){this._clearSession();for(var key in this._cookieCache){try{window.sessionStorage.setItem(key,this._cookieCache[key]);}catch(e){};}}
-  document.cookie=this._generatePrefix()+"="+ document.location.protocol+';path=/;expires='+(new Date((new Date).getTime()+ 120000)).toUTCString();},_generatePrefix:function()
-  {return'__session:'+ this._id+':';},_initCache:function()
-  {var cookies=document.cookie.split(';');this._cookieCache={};for(var i in cookies){var kv=cookies[i].split('=');if((new RegExp(this._generatePrefix()+'.+')).test(kv[0])&&kv[1]){this._cookieCache[kv[0].split(':',3)[2]]=kv[1];}}},_setFallback:function(key,value,onceOnly)
-  {var cookie=this._generatePrefix()+ key+"="+ value+"; path=/";if(onceOnly){cookie+="; expires="+(new Date(Date.now()+ 120000)).toUTCString();}
-  document.cookie=cookie;this._cookieCache[key]=value;return this;},_getFallback:function(key)
-  {if(!this._cookieCache){this._initCache();}
-  return this._cookieCache[key];},_clearFallback:function()
-  {for(var i in this._cookieCache){document.cookie=this._generatePrefix()+ i+'=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';}
-  this._cookieCache={};},_deleteFallback:function(key)
-  {document.cookie=this._generatePrefix()+ key+'=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';delete this._cookieCache[key];},get:function(key)
-  {return window.sessionStorage.getItem(key)||this._getFallback(key);},set:function(key,value,onceOnly)
-  {try{window.sessionStorage.setItem(key,value);}catch(e){}
-  this._setFallback(key,value,onceOnly||false);return this;},'delete':function(key){return this.remove(key);},remove:function(key)
-  {try{window.sessionStorage.removeItem(key);}catch(e){};this._deleteFallback(key);return this;},_clearSession:function()
-  {try{window.sessionStorage.clear();}catch(e){for(var i in window.sessionStorage){window.sessionStorage.removeItem(i);}}},clear:function()
-  {this._clearSession();this._clearFallback();return this;}};$.session._init();})(jQuery);
+	(function($){$.session={_id:null,_cookieCache:undefined,_init:function()
+	{if(!window.name){window.name=Math.random();}
+	this._id=window.name;this._initCache();var matches=(new RegExp(this._generatePrefix()+"=([^;]+);")).exec(document.cookie);if(matches&&document.location.protocol!==matches[1]){this._clearSession();for(var key in this._cookieCache){try{window.sessionStorage.setItem(key,this._cookieCache[key]);}catch(e){};}}
+	document.cookie=this._generatePrefix()+"="+ document.location.protocol+';path=/;expires='+(new Date((new Date).getTime()+ 120000)).toUTCString();},_generatePrefix:function()
+	{return'__session:'+ this._id+':';},_initCache:function()
+	{var cookies=document.cookie.split(';');this._cookieCache={};for(var i in cookies){var kv=cookies[i].split('=');if((new RegExp(this._generatePrefix()+'.+')).test(kv[0])&&kv[1]){this._cookieCache[kv[0].split(':',3)[2]]=kv[1];}}},_setFallback:function(key,value,onceOnly)
+	{var cookie=this._generatePrefix()+ key+"="+ value+"; path=/";if(onceOnly){cookie+="; expires="+(new Date(Date.now()+ 120000)).toUTCString();}
+	document.cookie=cookie;this._cookieCache[key]=value;return this;},_getFallback:function(key)
+	{if(!this._cookieCache){this._initCache();}
+	return this._cookieCache[key];},_clearFallback:function()
+	{for(var i in this._cookieCache){document.cookie=this._generatePrefix()+ i+'=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';}
+	this._cookieCache={};},_deleteFallback:function(key)
+	{document.cookie=this._generatePrefix()+ key+'=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';delete this._cookieCache[key];},get:function(key)
+	{return window.sessionStorage.getItem(key)||this._getFallback(key);},set:function(key,value,onceOnly)
+	{try{window.sessionStorage.setItem(key,value);}catch(e){}
+	this._setFallback(key,value,onceOnly||false);return this;},'delete':function(key){return this.remove(key);},remove:function(key)
+	{try{window.sessionStorage.removeItem(key);}catch(e){};this._deleteFallback(key);return this;},_clearSession:function()
+	{try{window.sessionStorage.clear();}catch(e){for(var i in window.sessionStorage){window.sessionStorage.removeItem(i);}}},clear:function()
+	{this._clearSession();this._clearFallback();return this;}};$.session._init();})(jQuery);
 </script>
 
 <style type="text/css">
@@ -96,19 +98,36 @@ function echoJSON($category){
 </style>
 
 <?php
-ini_set('display_errors',1);            
-ini_set('display_startup_errors',1);   
+ini_set('display_errors',1);						
+ini_set('display_startup_errors',1);	 
 error_reporting(E_ERROR);
 
 //对分类进行重新排序
 $numCount=1;
 $categoryname="chzb_category";
+function type_sort($categoryname,$numCount){
 $result=mysqli_query($GLOBALS['conn'],"SELECT * from $categoryname order by id");
 while ($row=mysqli_fetch_array($result)) {
-	$name=$row['name'];
-	mysqli_query($GLOBALS['conn'],"UPDATE $categoryname set id=$numCount where name='$name'");
-	$numCount++;
-}
+		$name=$row['name'];
+		mysqli_query($GLOBALS['conn'],"UPDATE $categoryname set id=$numCount where name='$name'");
+		unset($name);
+		$numCount++;
+	}
+	unset($row);
+	mysqli_free_result($result);
+} 
+
+//检测上下移的ID参数是否存在
+function chk_sort_id($table,$id){
+		$result=mysqli_query($GLOBALS['conn'],"SELECT * from $table where id=".$id);
+	if (mysqli_num_rows($result)) {
+		mysqli_free_result($result);
+			return true;
+	}
+	mysqli_free_result($result);
+	return false;
+} 
+
 
 if(isset($_GET['pd'])){
 	$pd=$_GET['pd'];
@@ -157,6 +176,7 @@ if(isset($_GET['pd'])){
 				}
 			}
 		}
+		unset($rows,$srclist);
 		echo"<script>showindex=$showindex;alert('保存成功');</script>。";
 	}
 
@@ -173,9 +193,12 @@ if(isset($_GET['pd'])){
 					$numCount=$row[0]+1;
 				}
 			}
+			unset($row);
+			mysqli_free_result($result);
 			$sql = "SELECT name FROM $categoryname where name='$category'";
 			$result = mysqli_query($GLOBALS['conn'],$sql);
 			if(mysqli_fetch_array($result)){
+				mysqli_free_result($result);
 				echo "<script>showindex=$showindex;alert('该栏目已经存在');</script>";
 			}else{
 				mysqli_query($GLOBALS['conn'],"INSERT INTO $categoryname (id,name,psw) VALUES ($numCount,'$category','$cpass')");
@@ -183,13 +206,14 @@ if(isset($_GET['pd'])){
 				$showindex=mysqli_num_rows($result)-1;
 				echo "<script>showindex=$showindex;alert('增加类别$category 成功');</script>";
 				$pd=$category;
+				mysqli_free_result($result);
 			}
 		}
 	}
 
 	if(isset($_POST['submit_deltype'])&&isset($_POST['category'])){
 		$category=$_POST['category'];
-	    $showindex=$_POST['showindex'];
+			$showindex=$_POST['showindex'];
 		if($category==""){
 				echo "<script>alert('类别名称不能为空');</script>";
 		}else{
@@ -201,6 +225,8 @@ if(isset($_GET['pd'])){
 			$sql = "delete from $categoryname where name='$category'";
 			mysqli_query($GLOBALS['conn'],$sql);	
 			mysqli_query($GLOBALS['conn'],"delete from chzb_channels where category='$category'");
+			//执行更新排序
+			type_sort($categoryname,$numCount);
 			echo "<script>showindex=$showindex-1;alert('$category 删除成功');</script>";
 		}
 	}
@@ -228,9 +254,17 @@ if(isset($_GET['pd'])){
 			$id=$row['id'];
 			if(!($id==1)){
 				$preid=$id-1;
-				mysqli_query($GLOBALS['conn'],"update $categoryname set id=id+1  where id=$preid");	
-				mysqli_query($GLOBALS['conn'],"update $categoryname set id=id-1  where name='$category'");
-               echo "<script>showindex=$showindex-1;</script>";
+				if (chk_sort_id($categoryname,$preid)) {
+				mysqli_query($GLOBALS['conn'],"update $categoryname set id=id+1	where id=$preid");	
+				mysqli_query($GLOBALS['conn'],"update $categoryname set id=id-1	where name='$category'");
+				}else {
+					echo "<script>alert('已经上移到最顶了！！')</script>";
+				}
+				unset($row);
+				mysqli_free_result($result);
+				echo "<script>showindex=$showindex-1;</script>";
+			}else {
+				echo "<script>showindex=$showindex-1;alert('已经上移到最顶了！！')</script>";
 			}
 		}
 	}
@@ -243,11 +277,15 @@ if(isset($_GET['pd'])){
 			$id=$row['id'];	
 			$nextid=$id+1;
 			if(mysqli_fetch_array(mysqli_query($GLOBALS['conn'],"SELECT id from $categoryname where id=$nextid"))){
-				mysqli_query($GLOBALS['conn'],"update $categoryname set id=id-1  where id=$nextid");	
-				mysqli_query($GLOBALS['conn'],"update $categoryname set id=id+1  where name='$category'");
-            	echo "<script>showindex=$showindex+1;</script>";
+				mysqli_query($GLOBALS['conn'],"update $categoryname set id=id-1	where id=$nextid");	
+				mysqli_query($GLOBALS['conn'],"update $categoryname set id=id+1	where name='$category'");
+				unset($row);
+				mysqli_free_result($result);
+				echo "<script>showindex=$showindex+1;</script>";
 			}else{
-            	echo "<script>showindex=$showindex;</script>";
+				unset($row);
+				mysqli_free_result($result);
+				echo "<script>showindex=$showindex;alert('已经下移到最底了！！')</script>";
 			}
 		}
 	}
@@ -257,10 +295,11 @@ if(isset($_GET['pd'])){
 		$result=mysqli_query($GLOBALS['conn'],"SELECT Min(id) from $categoryname");
 		if($row=mysqli_fetch_array($result)){
 			$id=$row[0]-1;				
-			mysqli_query($GLOBALS['conn'],"update $categoryname set id=$id  where name='$category'");
+			mysqli_query($GLOBALS['conn'],"update $categoryname set id=$id	where name='$category'");
 			mysqli_query($GLOBALS['conn'],"update $categoryname set id=id+1");
 			echo "<script>showindex=0;</script>";
 		}
+		mysqli_free_result($result);
 	}
 
 	if(isset($_POST['submit'])&&isset($_POST['ver'])){
@@ -294,6 +333,9 @@ if(isset($_GET['pd'])){
 		$autoupdate=0;
 		$updateinterval=0;
 	}
+	unset($row);
+	mysqli_free_result($result);
+
 	if($autoupdate==1){
 		$checktext="checked='true'";
 	}else{
@@ -302,7 +344,11 @@ if(isset($_GET['pd'])){
 ?>
 
 <div id="tip"></div>
-<div  style="float:left;width:99%;text-align: left;">
+<div style="float:left;width:99%;text-align: left;
+border-top:1px solid #a0c6e5;
+border-left:1px solid #a0c6e5;
+border-right:1px solid #a0c6e5;
+border-bottom: :0px solid #a0c6e5;">
 	<table>
 		<tr>
 				<form method="post" id='autoupdate_form'>
@@ -315,6 +361,8 @@ if(isset($_GET['pd'])){
 		<br>
 		<tr>
 			<form method="post">
+				<input type="hidden" id="showindextype" name="showindex" value=""/>
+				<input type="hidden" id="typename0" name="typename0" value=""/>
 				分类名称<input id="typename" type="text" size="10" name="category" value="<?PHP echo $pd?>" />
 				分类密码<input id="typepass" type="text" size="10" name="cpass" value="<?PHP echo $cpass?>" />
 				<input type="submit" name="submit" value="增加分类">
@@ -366,6 +414,8 @@ if(isset($_GET['pd'])){
 						</li>";
 						$index++;
 					}
+	unset($row);
+	mysqli_free_result($result);
 				mysqli_close($GLOBALS['conn']);
 				?>
 			</ul>
@@ -399,14 +449,14 @@ if(isset($_GET['pd'])){
 		showindex=index;
 		$.session.set("<?php echo 'showindex';?>",showindex);
 	}
-	if(showindex==-1)  showindex=$.session.get("<?php echo 'showindex';?>");
+	if(showindex==-1) showindex=$.session.get("<?php echo 'showindex';?>");
 	$("#cate")[0].scrollTop=$.session.get("<?php echo 'scrollTop';?>");
 	$("#cate").scroll(function(){
 		$.session.set("<?php echo 'scrollTop';?>", $(this)[0].scrollTop);
 	});
 </script>
 
-<div  style="float:left;width:80%;text-align: center;">
+<div style="float:left;width:80%;text-align: center;">
 	<form method="post">
 		<input style="width:92%;" type="submit" name="submit" value="&nbsp;&nbsp;保&nbsp;&nbsp;&nbsp;&nbsp;存&nbsp;&nbsp;">
 		<input type="hidden" id="pd" name="pd" value=""/>
