@@ -8,16 +8,21 @@
 - 下载代码
 ```bash
 git clone https://github.com/GaHoKwan/tvpanel
-or
+```
+或者
+```
 wget https://github.com/GaHoKwan/tvpanel/archive/master.zip && unzip master.zip
 ```
+
 - 新建并导入sql目录的数据库
 ```bash
 mysql -u帐号 -p密码 数据库名 < 数据库.sql
 ```
+
 - 创建配置文件
 ```bash
 cp .config.php config.php
+```
 
 - 修改配置文件
 ```
