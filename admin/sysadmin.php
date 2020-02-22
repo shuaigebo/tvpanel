@@ -41,28 +41,29 @@ if(isset($_POST['submit'])&&isset($_POST['newpassword'])){
 //添加管理员操作
 if(isset($_POST['adminadd'])){
 	if (empty($_POST['addadminname']) || empty($_POST['addadminpsw'])) {
-	    exit("<script>showindex=5;alert('管理员的账号或是密码不能为空！');</script>");
-	}
-	$adminname=$_POST['addadminname'];
-	$adminpsw=md5(PANEL_MD5_KEY.$_POST['addadminpsw']);
-	$result=mysqli_query($GLOBALS['conn'],"SELECT count(*) from chzb_admin");
-	if($row=mysqli_fetch_array($result)){
-		if($row[0]>5){
-			unset($row);
-			mysqli_free_result($result);
-			echo"<script>showindex=5;alert('管理员数量已达上限！');</script>"; 
-		}else{
-		$result=mysqli_query($GLOBALS['conn'],"select * from chzb_admin where name='$adminname'");
-			if(mysqli_fetch_array($result)){
+	    echo"<script>showindex=5;alert('管理员的账号或是密码不能为空！');</script>";
+	}else{
+		$adminname=$_POST['addadminname'];
+		$adminpsw=md5(PANEL_MD5_KEY.$_POST['addadminpsw']);
+		$result=mysqli_query($GLOBALS['conn'],"SELECT count(*) from chzb_admin");
+		if($row=mysqli_fetch_array($result)){
+			if($row[0]>5){
 				unset($row);
 				mysqli_free_result($result);
-        echo"<script>showindex=5;alert('用户名已存在！');</script>"; 
-      }else{
-        mysqli_query($GLOBALS['conn'],"INSERT into chzb_admin (name,psw) values ('$adminname','$adminpsw')");
-        echo"<script>showindex=5;alert('管理员添加成功！');</script>"; 
-      }
-    }
-  }
+				echo"<script>showindex=5;alert('管理员数量已达上限！');</script>"; 
+			}else{
+			$result=mysqli_query($GLOBALS['conn'],"select * from chzb_admin where name='$adminname'");
+				if(mysqli_fetch_array($result)){
+					unset($row);
+					mysqli_free_result($result);
+					echo"<script>showindex=5;alert('用户名已存在！');</script>"; 
+				}else{
+					mysqli_query($GLOBALS['conn'],"INSERT into chzb_admin (name,psw) values ('$adminname','$adminpsw')");
+					echo"<script>showindex=5;alert('管理员添加成功！');</script>"; 
+				}
+			}
+		}
+	}
 }
 
 //删除账号操作
@@ -86,10 +87,8 @@ if(isset($_POST['deleteadmin'])){
 }
 
 //设置管理员权限
-if(isset($_POST['saveauthorinfo'])&&isset($_POST['adminname'])){
-	if (substr_count(json_encode($_POST,JSON_UNESCAPED_UNICODE),'"admin"') !=5) {
-	    echo("<script>showindex=5;alert('本次权限操作中，含有 admin 超级管理员权限不能被取消！');</script>");
-	}else {
+if(isset($_POST['saveauthorinfo'])){
+	if ( !empty($adminname)) {
 		mysqli_query($GLOBALS['conn'],"UPDATE chzb_admin set useradmin0=0,useradmin1=0,useradmin2=0,ipcheck=0,eadmin=0,channeladmin=0 where name<>'admin'");
 		foreach ($_POST['useradmin0'] as $adminname){ 
 			mysqli_query($GLOBALS['conn'],"UPDATE chzb_admin set useradmin0=1 where name='$adminname'"); 
@@ -110,6 +109,8 @@ if(isset($_POST['saveauthorinfo'])&&isset($_POST['adminname'])){
 			mysqli_query($GLOBALS['conn'],"UPDATE chzb_admin set channeladmin=1 where name='$adminname'"); 
 		}
 		echo"<script>showindex=5;alert('管理员权限设定已保存！');</script>";
+	}else{
+		echo"<script>showindex=5;alert('请选择管理员！');</script>";
 	}
 }
 
@@ -647,7 +648,8 @@ function showli(index){
 						<form method="POST">
 							<table border="1" bordercolor="#00f" style="border-collapse:collapse;margin:20px">
 								<tr>
-									<td width="200px">用户名</td>
+									<td width="20px"></td>
+									<td width="180px">用户名</td>
 									<td width="100px">识别授权</td>
 									<td width="100px">账号授权</td>
 									<td width="100px">用户管理</td>
@@ -695,15 +697,29 @@ function showli(index){
 									}else{
 										$channeladminchecked="";
 									}
-									echo "<tr>
-										<td width=\"200px\"><input value='$adminname' name='adminname[]' type='checkbox'>$adminname</td>
-										<td width=\"150px\"><input value='$adminname' name='useradmin0[]' type='checkbox' $useradmin0checked ></td>
-										<td width=\"150px\"><input value='$adminname' name='useradmin1[]' type='checkbox' $useradmin1checked ></td>
-										<td width=\"150px\"><input value='$adminname' name='useradmin2[]' type='checkbox' $useradmin2checked ></td>
-										<td width=\"150px\"><input value='$adminname' name='ipcheck[]' type='checkbox' $ipcheckchecked ></td>
-										<td width=\"150px\"><input value='$adminname' name='epgadmin[]' type='checkbox' $epgadminchecked ></td>
-										<td width=\"150px\"><input value='$adminname' name='channeladmin[]' type='checkbox' $channeladminchecked ></td>
-									</tr>";
+									if($adminname == 'admin'){
+										echo "<tr>
+											<td width=\"20px\"></td>
+											<td width=\"180px\">admin</td>
+											<td width=\"150px\"><input value='$adminname' name='useradmin0[]' type='checkbox' checked='true' disabled='true'></td>
+											<td width=\"150px\"><input value='$adminname' name='useradmin1[]' type='checkbox' checked='true' disabled='true'></td>
+											<td width=\"150px\"><input value='$adminname' name='useradmin2[]' type='checkbox' checked='true' disabled='true'></td>
+											<td width=\"150px\"><input value='$adminname' name='ipcheck[]' type='checkbox' checked='true' disabled='true'></td>
+											<td width=\"150px\"><input value='$adminname' name='epgadmin[]' type='checkbox' checked='true' disabled='true'></td>
+											<td width=\"150px\"><input value='$adminname' name='channeladmin[]' type='checkbox' checked='true' disabled='true'></td>
+										</tr>";
+									}else{
+										echo "<tr>
+											<td width=\"20px\"><input value='$adminname' name='adminname[]' type='checkbox'></td>
+											<td width=\"180px\">$adminname</td>
+											<td width=\"150px\"><input value='$adminname' name='useradmin0[]' type='checkbox' $useradmin0checked ></td>
+											<td width=\"150px\"><input value='$adminname' name='useradmin1[]' type='checkbox' $useradmin1checked ></td>
+											<td width=\"150px\"><input value='$adminname' name='useradmin2[]' type='checkbox' $useradmin2checked ></td>
+											<td width=\"150px\"><input value='$adminname' name='ipcheck[]' type='checkbox' $ipcheckchecked ></td>
+											<td width=\"150px\"><input value='$adminname' name='epgadmin[]' type='checkbox' $epgadminchecked ></td>
+											<td width=\"150px\"><input value='$adminname' name='channeladmin[]' type='checkbox' $channeladminchecked ></td>
+										</tr>";
+									}
 								}
 								unset($row);
 								mysqli_free_result($result);
