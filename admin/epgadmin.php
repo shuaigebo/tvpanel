@@ -168,7 +168,7 @@ if ($_GET["act"]=="edits") {
 	$ids = implode(",",array_unique($_POST['ids']));
 	$remarks = $_POST["remarks"];
 	mysqli_query($GLOBALS['conn'],"update chzb_epg set name='".$epg_name."',content='".$ids."',remarks='".$remarks."' where id=".$id);
-	exit("<script>javascript:alert('EPG名为 ".$epg_name." 修改成功!');self.location='epg.php';</script>");
+	exit("<script>javascript:alert('EPG名为 ".$epg_name." 修改成功!');self.location='epgadmin.php';</script>");
 }
 
 mysqli_free_result($result);
@@ -182,7 +182,7 @@ if ($_GET["act"]=="edit") {
 	$result=mysqli_query($GLOBALS['conn'],"select name,content,remarks from chzb_epg where id=".$id);
 	if (!mysqli_num_rows($result)) {
 		mysqli_free_result($result);
-		exit("<script>javascript:alert('EPG不存在!');self.location='epg.php';</script>");
+		exit("<script>javascript:alert('EPG不存在!');self.location='epgadmin.php';</script>");
 	}
 	$r=mysqli_fetch_array($result,MYSQLI_ASSOC);
 	$ca=$r["content"];
