@@ -157,7 +157,7 @@ function get_epg_data($tvid,$epgid,$name="",$date=""){
 	    
 //51zmt
 	}else if(strstr($epgid,"51zmt") != false){
-		$cachefile="./cache/e.xml";
+		$cachefile="./cache/51zmt.xml";
 		$url="http://epg.51zmt.top:8000/e.xml";
 		if(file_exists($cachefile)){
 			$filemtime=filemtime ($cachefile);
@@ -171,7 +171,7 @@ function get_epg_data($tvid,$epgid,$name="",$date=""){
 				file_put_contents($cachefile,$file) ;
 		}
 		$xml = simplexml_load_file($cachefile);
-        $xml = json_encode($cachefile);
+        $xml = json_encode($xml);
         $xml = json_decode($xml,true);
 		$arr=$channel=$epgdata=$result=array();
         foreach($xml['channel'] as $row){
