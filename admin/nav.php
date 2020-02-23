@@ -4,10 +4,11 @@
 <?php include_once "../config.php";include_once "val.php"; ?>
 
 <style type="text/css">
+body{ font-family: "Microsoft YaHei", "微软雅黑", "MicrosoftJhengHei", "华文细黑", "STHeiti", "MingLiu", "Helvetica" }
 a:link, a:visited { text-decoration: none; color: #000 }
 #topnav { width: 100%; background: #33a996; height: 50px; line-height: 50px; }
 #topnav ul { width: 100%; margin: auto }
-#topnav a { display: inline-block; font-size: 18px; font-family: "Microsoft Yahei", Arial, Helvetica, sans-serif; padding: 0 20px; }
+#topnav a { display: inline-block; font-size: 18px; padding: 0 20px; }
 #topnav a:hover { background: #345; color: #fff; border-top: 0px solid #f77825; }
 #topnav a { color: #FFF }
 #topnav_current { background: #345; border-top: 0px solid #f77825; color: #fff }/* 高亮选中颜色 */

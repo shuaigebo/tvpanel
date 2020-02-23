@@ -12,6 +12,7 @@ mysqli_query($GLOBALS['conn'],"alter table chzb_appdata add column updateinterva
 mysqli_query($GLOBALS['conn'],"alter table chzb_category add column psw varchar(16) DEFAULT '';");
 
 if($_SESSION['channeladmin']==0){
+	echo"<script>alert('你无权访问此页面！');history.go(-1);</script>";
 	exit();
 }
 

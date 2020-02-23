@@ -11,7 +11,10 @@ var showindex=0;
 <?php
 include_once "nav.php";
 
-if($user!='admin')echo"<script>alert('你无权访问此页面！');history.go(-2);</script>"; 
+if($user!='admin'){
+	echo"<script>alert('你无权访问此页面！');history.go(-1);</script>";
+	exit();
+}
 
 //升级数据库
 $src1=dirname('http://'.$_SERVER['SERVER_NAME'].$_SERVER["REQUEST_URI"]).'/';
@@ -88,25 +91,37 @@ if(isset($_POST['deleteadmin'])){
 
 //设置管理员权限
 if(isset($_POST['saveauthorinfo'])){
-	if ( !empty($adminname)) {
-		mysqli_query($GLOBALS['conn'],"UPDATE chzb_admin set useradmin0=0,useradmin1=0,useradmin2=0,ipcheck=0,eadmin=0,channeladmin=0 where name<>'admin'");
-		foreach ($_POST['useradmin0'] as $adminname){ 
-			mysqli_query($GLOBALS['conn'],"UPDATE chzb_admin set useradmin0=1 where name='$adminname'"); 
+	if ( !empty($_POST['adminname'])) {
+		mysqli_query($GLOBALS['conn'],"UPDATE chzb_admin set useradmin0=0,useradmin1=0,useradmin2=0,ipcheck=0,epgadmin=0,channeladmin=0 where name<>'admin'");
+		if ( !empty($_POST['useradmin0'])) {
+			foreach ($_POST['useradmin0'] as $adminname){
+				mysqli_query($GLOBALS['conn'],"UPDATE chzb_admin set useradmin0=1 where name='$adminname'");
+			}
 		}
-		foreach ($_POST['useradmin1'] as $adminname){
-			mysqli_query($GLOBALS['conn'],"UPDATE chzb_admin set useradmin1=1 where name='$adminname'"); 
+		if ( !empty($_POST['useradmin1'])) {
+			foreach ($_POST['useradmin1'] as $adminname){
+				mysqli_query($GLOBALS['conn'],"UPDATE chzb_admin set useradmin1=1 where name='$adminname'");
+			}
 		}
-		foreach ($_POST['useradmin2'] as $adminname){
-			mysqli_query($GLOBALS['conn'],"UPDATE chzb_admin set useradmin2=1 where name='$adminname'"); 
+		if ( !empty($_POST['useradmin2'])) {
+			foreach ($_POST['useradmin2'] as $adminname){
+				mysqli_query($GLOBALS['conn'],"UPDATE chzb_admin set useradmin2=1 where name='$adminname'");
+			}
 		}
-		foreach ($_POST['ipcheck'] as $adminname){
-			mysqli_query($GLOBALS['conn'],"UPDATE chzb_admin set ipcheck=1 where name='$adminname'"); 
+		if ( !empty($_POST['ipcheck'])) {
+			foreach ($_POST['ipcheck'] as $adminname){
+				mysqli_query($GLOBALS['conn'],"UPDATE chzb_admin set ipcheck=1 where name='$adminname'");
+			}
 		}
-		foreach ($_POST['epgadmin'] as $adminname){
-			mysqli_query($GLOBALS['conn'],"UPDATE chzb_admin set epgadmin=1 where name='$adminname'"); 
+		if ( !empty($_POST['epgadmin'])) {
+			foreach ($_POST['epgadmin'] as $adminname){
+				mysqli_query($GLOBALS['conn'],"UPDATE chzb_admin set epgadmin=1 where name='$adminname'");
+			}
 		}
-		foreach ($_POST['channeladmin'] as $adminname){
-			mysqli_query($GLOBALS['conn'],"UPDATE chzb_admin set channeladmin=1 where name='$adminname'"); 
+		if ( !empty($_POST['channeladmin'])) {
+			foreach ($_POST['channeladmin'] as $adminname){
+				mysqli_query($GLOBALS['conn'],"UPDATE chzb_admin set channeladmin=1 where name='$adminname'");
+			}
 		}
 		echo"<script>showindex=5;alert('管理员权限设定已保存！');</script>";
 	}else{
@@ -699,7 +714,7 @@ function showli(index){
 									}
 									if($adminname == 'admin'){
 										echo "<tr>
-											<td width=\"20px\"></td>
+											<td width=\"20px\">⊗</td>
 											<td width=\"180px\">admin</td>
 											<td width=\"150px\"><input value='$adminname' name='useradmin0[]' type='checkbox' checked='true' disabled='true'></td>
 											<td width=\"150px\"><input value='$adminname' name='useradmin1[]' type='checkbox' checked='true' disabled='true'></td>

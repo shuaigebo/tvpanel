@@ -23,6 +23,7 @@ error_reporting(E_ERROR);
 include_once "nav.php";
 
 if($_SESSION['useradmin2']==0){
+	echo"<script>alert('你无权访问此页面！');history.go(-1);</script>";
 	exit();
 }
 

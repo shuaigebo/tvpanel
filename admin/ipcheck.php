@@ -8,6 +8,7 @@ include "nav.php";
 include "val.php";
 
 if($_SESSION['ipcheck']==0){
+	echo"<script>alert('你无权访问此页面！');history.go(-1);</script>";
 	exit();
 }
 

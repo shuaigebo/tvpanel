@@ -4,13 +4,13 @@ ini_set("error_reporting","E_ALL & ~E_NOTICE");
 session_start();
 include_once "../config.php";
 if(!empty($_POST['username'])&& !empty($_POST['password'])){
-    $user=mysqli_real_escape_string($GLOBALS['conn'],$_POST['username']);
-    $psw=mysqli_real_escape_string($GLOBALS['conn'],$_POST['password']);
-    $psw=md5("tvkey_".$psw);
-    $result=mysqli_query($GLOBALS['conn'],"select * from chzb_admin where name='$user'");
-    if($row=mysqli_fetch_array($result)){
-        if($psw==$row['psw']){
-        	$user=$row['name'];
+	$user=mysqli_real_escape_string($GLOBALS['conn'],$_POST['username']);
+	$psw=mysqli_real_escape_string($GLOBALS['conn'],$_POST['password']);
+	$psw=md5("tvkey_".$psw);
+	$result=mysqli_query($GLOBALS['conn'],"select * from chzb_admin where name='$user'");
+	if($row=mysqli_fetch_array($result)){
+		if($psw==$row['psw']){
+			$user=$row['name'];
             $_SESSION['user']=$user;
             $_SESSION['psw']=$row['psw']; 
             $_SESSION['useradmin0']=$row['useradmin0'];
@@ -26,16 +26,16 @@ if(!empty($_POST['username'])&& !empty($_POST['password'])){
             }else{
             	setcookie("rememberpass","1",time()-3600);
             }
-	    unset($row);
-	    mysqli_free_result($result);
-	    mysqli_close($GLOBALS['conn']);
-            header("location:nav.php");
-        }else{
-            echo "<script>alert('密码错误！');</script>";
-        }
-    }else{
-        echo "<script>alert('用户不存在！');</script>";
-    }
+		unset($row);
+		mysqli_free_result($result);
+		mysqli_close($GLOBALS['conn']);
+		header("location:nav.php");
+		}else{
+			echo "<script>alert('密码错误！');</script>";
+		}
+	}else{
+		echo "<script>alert('用户不存在！');</script>";
+	}
 	unset($row);
 	mysqli_free_result($result);
 	mysqli_close($GLOBALS['conn']);
@@ -46,7 +46,7 @@ if(isset($_COOKIE['rememberpass'])){
 	$psw=mysqli_real_escape_string($GLOBALS['conn'],$_COOKIE['psw']);
 	$result=mysqli_query($GLOBALS['conn'],"select * from chzb_admin where name='$user'");
 	if($row=mysqli_fetch_array($result)){
-    	if($psw==$row['psw']){
+		if($psw==$row['psw']){
 			$_SESSION['user']=$user;
 			$_SESSION['psw']=$psw;
             $_SESSION['useradmin0']=$row['useradmin0'];
@@ -64,19 +64,6 @@ if(isset($_COOKIE['rememberpass'])){
 	unset($row);
 	mysqli_free_result($result);
 	mysqli_close($GLOBALS['conn']);
-}
-
-/**
-* 防止sql注入自定义方法一
-* author: xiaochuan
-* @param: mixed $value 参数值
-*/ 
-function check_param($value=null) { 
-    $str = 'select|insert|and|or|update|delete|\'|\/\*|\*|\.\.\/|\.\/|union|into|load_file|outfile';
-    if(eregi($str, $value)) { 
-        $vals=str_replace($value,"",$value);
-    }
-    return $vals; 
 }
 
 ?>

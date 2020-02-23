@@ -22,6 +22,11 @@ error_reporting(E_ERROR);
 
 include_once "nav.php";
 
+if($_SESSION['epgadmin']==0){
+	echo"<script>alert('你无权访问此页面！');history.go(-1);</script>";
+	exit();
+}
+
 if(isset($_GET['keywords'])){
 	$keywords=$_GET['keywords'];
 	$searchparam="where name like '%$keywords%' or remarks like '%$keywords%' or content like '%$keywords%'";

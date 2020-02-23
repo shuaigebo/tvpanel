@@ -10,7 +10,10 @@ error_reporting(E_ERROR);
 
 include_once "nav.php";
 
-if($_SESSION['useradmin0']==0)exit();
+if($_SESSION['useradmin0']==0){
+	echo"<script>alert('你无权访问此页面！');history.go(-1);</script>";
+	exit();
+}
 
 if(isset($_POST['submitdel'])){
 	foreach ($_POST['id'] as $id){

@@ -10,7 +10,10 @@ error_reporting(E_ERROR);
 
 include_once "nav.php";
 
-if($_SESSION['useradmin1']==0)exit();
+if($_SESSION['useradmin1']==0){
+	echo"<script>alert('你无权访问此页面！');history.go(-1);</script>";
+	exit();
+}
 
 function genName(){
 	$name=rand(10000000,99999999);
