@@ -40,6 +40,9 @@ $db_dabse="";  //数据库名称
 http://{域名}/admin/userlogin.php
 ```
 
+## 捐赠
+![image](https://github.com/GaHoKwan/tvpanel/raw/master/wechat-pay.png)
+
 ## 客户端对接（提示：act3.php -> active.php  ， login3.php -> login.php）
 - 无教程，如需指导搭建请扫码联系微信，有偿服务。
 
