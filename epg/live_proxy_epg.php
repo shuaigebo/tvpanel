@@ -77,7 +77,7 @@ function get_epg_data($tvid,$epgid,$name="",$date=""){
 
 //极速数据
 	}else if(strstr($epgid,"jisu") != false){
-		$appkey = "";
+		$appkey = JISU_API_KEY;
         $url = "https://api.jisuapi.com/tv/query?appkey=".$appkey."&tvid=".substr($epgid, 5)."&date=".date('Y-m-d');
 	    $str=curl::c()->set_ssl()->get($url);
 	    $re=json_decode($str,true);

@@ -4,6 +4,7 @@ header("Content-type: text/html; charset=utf-8");
 define("APPS_SIG","12315");  //APP签名验证秘钥
 define("APPS_APPNAME","");  //APP软件名
 define("APPS_PACKAGENAME","");  //APP包名
+define("JISU_API_KEY","");  //极速数据API秘钥
 define("PANEL_MD5_KEY","tvkey_");  //面板密码MD5加密秘钥
 
 $db_host="localhost";  //数据库服务器
