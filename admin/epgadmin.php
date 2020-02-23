@@ -168,7 +168,7 @@ if ($_GET["act"]=="edits") {
 	$ids = implode(",",array_unique($_POST['ids']));
 	$remarks = $_POST["remarks"];
 	mysqli_query($GLOBALS['conn'],"update chzb_epg set name='".$epg_name."',content='".$ids."',remarks='".$remarks."' where id=".$id);
-	exit("<script>javascript:alert('EPG名为 ".$epg_name." 修改成功!');self.location='epg.php';</script>");
+	exit("<script>javascript:alert('EPG名为 ".$epg_name." 修改成功!');self.location='epgadmin.php';</script>");
 }
 
 mysqli_free_result($result);
@@ -182,24 +182,30 @@ if ($_GET["act"]=="edit") {
 	$result=mysqli_query($GLOBALS['conn'],"select name,content,remarks from chzb_epg where id=".$id);
 	if (!mysqli_num_rows($result)) {
 		mysqli_free_result($result);
-		exit("<script>javascript:alert('EPG不存在!');self.location='epg.php';</script>");
+		exit("<script>javascript:alert('EPG不存在!');self.location='epgadmin.php';</script>");
 	}
 	$r=mysqli_fetch_array($result,MYSQLI_ASSOC);
 	$ca=$r["content"];
 	$bz=$r["remarks"];
 	if(strstr($r["name"],"cntv") != false){
 		$na = substr($r["name"], 5);
-		$epgname = '<option value="cntv" selected>CCTV官网</option><option value="tvsou">搜视网</option><option value="51zmt">51zmt</option>';
+		$epgname = '<option value="cntv" selected>CCTV官网</option><option value="jisu">极速数据</option><option value="tvmao">电视猫</option><option value="tvsou">搜视网</option><option value="51zmt">51zmt</option>';
+	}else if(strstr($r["name"],"jisu") != false){
+		$na = substr($r["name"], 5);
+		$epgname = '<option value="cntv">CCTV官网</option><option value="jisu" selected>极速数据</option><option value="tvmao">电视猫</option><option value="tvsou">搜视网</option><option value="51zmt">51zmt</option>';
+	}else if(strstr($r["name"],"tvmao") != false){
+		$na = substr($r["name"], 6);
+		$epgname = '<option value="cntv">CCTV官网</option><option value="jisu">极速数据</option><option value="tvmao"  selected>电视猫</option><option value="tvsou">搜视网</option><option value="51zmt">51zmt</option>';
 	}else if(strstr($r["name"],"tvsou") != false){
 		$na = substr($r["name"], 6);
-		$epgname = '<option value="cntv">CCTV官网</option><option value="tvsou"  selected>搜视网</option><option value="51zmt">51zmt</option>';
+		$epgname = '<option value="cntv">CCTV官网</option><option value="jisu">极速数据</option><option value="tvmao">电视猫</option><option value="tvsou"  selected>搜视网</option><option value="51zmt">51zmt</option>';
 	}else if(strstr($r["name"],"51zmt") != false){
 		$na = substr($r["name"], 6);
-		$epgname = '<option value="cntv">CCTV官网</option><option value="tvsou">搜视网</option><option value="51zmt"  selected>51zmt</option>';
+		$epgname = '<option value="cntv">CCTV官网</option><option value="jisu">极速数据</option><option value="tvmao">电视猫</option><option value="tvsou">搜视网</option><option value="51zmt"  selected>51zmt</option>';
 	}
 	unset($r);
 	mysqli_free_result($result);
-	//获取套餐所有的收视内容
+	//获取频道内容
 	$sql="SELECT distinct name FROM chzb_channels order by category,id";
 	$result=mysqli_query($GLOBALS['conn'],$sql);
 	if (!mysqli_num_rows($result)) {
@@ -283,7 +289,7 @@ function quanxuan(a){
     <tr>
 	    <td colspan=11><b>EPG列表</b>&nbsp;
 		    <form method="POST" action="?act=add">
-		        来源:<select id="epg" name="epg"> <option value="">请选来源</option><option value="cntv">CCTV官网</option><option value="tvsou">搜视网</option><option value="51zmt">51zmt</option></select>&nbsp;
+				来源:<select id="epg" name="epg"> <option value="">请选来源</option><option value="cntv">CCTV官网</option><option value="jisu">极速数据</option><option value="tvmao">电视猫</option><option value="tvsou">搜视网</option><option value="51zmt">51zmt</option></select>&nbsp;
                 名称:&nbsp;<input type="text" style="width:100px;" name="name">&nbsp; 备注:&nbsp;<input type="text" style="width:100px;" name="remarks">&nbsp;&nbsp;<input type="submit" value="新增">&nbsp;<input type="reset" value="重置">
             </form>
 			<form method="POST">
@@ -347,9 +353,8 @@ function quanxuan(a){
         <td width="150" align="center" style="font-size:14px;font-weight: bold;">操作</td>
 	</tr>
 <?php
-//获取套餐数据显示
+//获取EPG数据显示
 $recStart=$recCounts*($page-1);
-//print_r("select * from chzb_epg $searchparam limit $recStart,$recCounts");exit;
 $result=mysqli_query($GLOBALS['conn'],"select * from chzb_epg $searchparam limit $recStart,$recCounts");
 if (!mysqli_num_rows($result)) {
     echo"<tr>";
@@ -371,6 +376,10 @@ while ($r=mysqli_fetch_array($result,MYSQLI_ASSOC)) {
 	$epg = explode("-",$r['name']);
 	if($epg[0] == 'cntv'){
 			$epgname = 'CCTV官网';
+	}else if($epg[0] == 'jisu'){
+			$epgname = '极速数据';
+	}else if($epg[0] == 'tvmao'){
+			$epgname = '电视猫';
 	}else if($epg[0] == 'tvsou'){
 			$epgname = '搜视网';
 	}else if($epg[0] == '51zmt'){

@@ -59,9 +59,10 @@ function cache_time_out(){
 } 
 
 //请求频道的EPG数据
+//CNTV
 function get_epg_data($tvid,$epgid,$name="",$date=""){
 	if(strstr($epgid,"cntv") != false){
-		$url = "http://api.cntv.cn/epg/epginfo?serviceId=cbox&c=".substr($epgid, 5)."&d=".date('Ymd');
+		$url = "https://api.cntv.cn/epg/epginfo?serviceId=cbox&c=".substr($epgid, 5)."&d=".date('Ymd');
 		$str=curl::c()->set_ssl()->get($url);
 		$re=json_decode($str,true);
 		if (!empty($re[substr($epgid, 5)]['program'])){
@@ -73,20 +74,42 @@ function get_epg_data($tvid,$epgid,$name="",$date=""){
 		}
 		$data=["code"=>500,"msg"=>"请求失败!","name"=>$name,"date"=>null,"data"=>null];
 	    return json_encode($data,JSON_UNESCAPED_UNICODE);
+
+//极速数据
+	}else if(strstr($epgid,"jisu") != false){
+		$appkey = "";
+        $url = "https://api.jisuapi.com/tv/query?appkey=".$appkey."&tvid=".substr($epgid, 5)."&date=".date('Y-m-d');
+	    $str=curl::c()->set_ssl()->get($url);
+	    $re=json_decode($str,true);
+	    if ($re["status"]==0) {
+	        $data=[];
+		    $data["code"]=200;
+		    $data["msg"]="请求成功!";
+		    $data["name"]=$re["result"]["name"];
+		    $data["tvid"]=$re["result"]["tvid"];
+		    $data["date"]=$re["result"]["date"];
+		    $data["data"]=$re["result"]["program"];
+		    return json_encode($data,JSON_UNESCAPED_UNICODE);
+	    }
+	    $data=["code"=>500,"msg"=>"请求失败!","name"=>$name,"date"=>null,"data"=>null];
+	    return json_encode($data,JSON_UNESCAPED_UNICODE);
+
+//搜视网
 	}else if(strstr($epgid,"tvsou") != false){
 		$wday = intval(date('w',strtotime(date('Y-m-d'))));
-	    if($wday == 0)
-		    $wday = 7;
+	    if($wday == 0)$wday = 7;
 		$url = "https://www.tvsou.com/epg/".substr($epgid, 6)."/w".$wday;
 		$file=curl::c()->set_ssl()->get($url);
 	    $file=strstr($file,"<tbody>");
 		$pos = strpos($file,"</tbody>");
 	    $file=substr($file,0,$pos);
-		$file =  preg_replace(array("/<script[\s\S]*?<\/script>/i","/<a .*?href='(.*?)'.*?>/is","/<tbody>/i","/<\/a>/i","/<td[\s\S]*?>/i"), '', $file);
-		$file =  str_replace("</td></td></tr> ", '|', $file);
-		$file =  str_replace("</td>", '#', $file);
-		$file =  str_replace(array("<tr>","\r","\n","\r\n"," "), '', $file);
-		$preview = substr($file,0,strlen($file)-1);
+		$file =  preg_replace(array("/<script[\s\S]*?<\/script>/i","/<a .*?href='(.*?)'.*?>/is","/<tbody>/i","/<\/a>/i"), '', $file);
+		$file = trim($file);		
+		$file = str_replace("</td><td style='width: 100px;'></td></tr> <tr><td>",'|',$file);		
+		$file = str_replace("</td><td style='width: 100px;'></td></tr>",'',$file);		
+		$file = str_replace("<tr><td>",'',$file);		
+		$file = str_replace("</td><td>",'#',$file);
+		$preview = $file;
 		if (!empty($preview)){
 		    $data=array("code"=>200,"msg"=>"请求成功!","name"=>$name,"tvid"=>$tvid,"date"=>date('Y-m-d'));
 		    $preview = explode('|',$preview);
@@ -98,12 +121,57 @@ function get_epg_data($tvid,$epgid,$name="",$date=""){
 	    }
 	    $data=["code"=>500,"msg"=>"请求失败!","name"=>$name,"date"=>null,"data"=>null];
 	    return json_encode($data,JSON_UNESCAPED_UNICODE);
+
+//电视猫
+	}else if(strstr($epgid,"tvmao") != false){
+		$keyStr = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+		$wday = intval(date('w',strtotime(date('Y-m-d'))));
+	    if($wday == 0)
+		    $wday = 7;
+		$str=curl::c()->set_ssl()->get("https://m.tvmao.com/program/".substr($epgid, 6)."-w".$wday.".html");
+		preg_match('#action="/query.jsp" q="(\w+)" a="(\w+)"#',$str,$id);
+        preg_match('#name="submit" id="(\w+)"#',$str,$id1);
+		$str1=curl::c()->set_ssl()->get("https://m.tvmao.com/api/pg?p=".$keyStr[$wday*$wday].base64_encode($id1[1]."|".$id[2]).base64_encode("|".$id[1]));
+		$str1 =  preg_replace(array('/<tr[^>]*>/i', '/<td[^>]*>/i','/<div[^>]*>/i','/<a[^>]*>/i'), '', $str1);
+		$str1 =  str_replace("<\/a>", '', $str1);
+		$str1 =  str_replace("<\/div><\/td>", '#', $str1);
+		$str1 =  str_replace("<\/td><\/tr>", '|', $str1);
+		$str1 =  str_replace('[1,"', '', $str1);
+		$str1 =  str_replace('"]', '', $str1);
+		$str1 =  str_replace('\n', '', $str1);
+		$str1 = substr($str1,0,strlen($str1)-1);
+		$preview = $str1;
+		if (!empty($preview)){			
+			$data=array("code"=>200,"msg"=>"请求成功!","name"=>$name,"tvid"=>$tvid,"date"=>date('Y-m-d'));
+		    $preview = explode('|',$preview);
+		    foreach($preview as $row){
+			    $row1 = explode('#',$row);
+			    $data["data"][]= array("name"=> $row1[1],"starttime"=> $row1[0]);
+		    }		
+		    return json_encode($data,JSON_UNESCAPED_UNICODE);
+						
+	    }
+	    $data=["code"=>500,"msg"=>"请求失败!","name"=>$name,"date"=>null,"data"=>null];
+		//echo "失败";
+	    return json_encode($data,JSON_UNESCAPED_UNICODE);
+	    
+//51zmt
 	}else if(strstr($epgid,"51zmt") != false){
-		/*
-		$url = "http://epg.51zmt.top:8000/e.xml";
-		$file=curl::c()->set_ssl()->get($url);
-		file_put_contents('./cache/e.xml',$file) ;
-        $xml = json_encode('./cache/e.xml');
+		$cachefile="./cache/e.xml";
+		$url="http://epg.51zmt.top:8000/e.xml";
+		if(file_exists($cachefile)){
+			$filemtime=filemtime ($cachefile);
+			if (time()-$filemtime>= 259200){
+				unlink($cachefile);
+				$file=curl::c()->get($url);
+				file_put_contents($cachefile,$file) ;
+			}
+		}else{
+				$file=curl::c()->get($url);
+				file_put_contents($cachefile,$file) ;
+		}
+		$xml = simplexml_load_file($cachefile);
+        $xml = json_encode($cachefile);
         $xml = json_decode($xml,true);
 		$arr=$channel=$epgdata=$result=array();
         foreach($xml['channel'] as $row){
@@ -122,9 +190,7 @@ function get_epg_data($tvid,$epgid,$name="",$date=""){
 		    }
 	    }
 		foreach($xml['programme'] as $row){
-		    if(substr($row['@attributes']['start'],0,8) == date('Ymd')){
-		         $epgdata[] = array('id'=>$row['@attributes']['channel'],"start"=>$row['@attributes']['start'],'title'=>$row['title']);
-	        }
+		    $epgdata[] = array('id'=>$row['@attributes']['channel'],"start"=>$row['@attributes']['start'],'title'=>$row['title']);
 	    }
 		if (!empty($epgdata)){
 	        $data=array("code"=>200,"msg"=>"请求成功!","name"=>$name,"tvid"=>$tvid,"date"=>date('Y-m-d'));
@@ -135,15 +201,13 @@ function get_epg_data($tvid,$epgid,$name="",$date=""){
 	        }
 	        return json_encode($data,JSON_UNESCAPED_UNICODE);
 		}
-		*/
-		$data=["code"=>200,"msg"=>"51zmt接口暂不可用","name"=>$name,"date"=>null,"data"=>"51zmt接口暂不可用"];
+		$data=["code"=>500,"msg"=>"请求失败!","name"=>$name,"date"=>null,"data"=>null];
 	    return json_encode($data,JSON_UNESCAPED_UNICODE);
 	}
 } 
 
 //频道映射对应表
 function channel($id){
-	global $con;
 	$id=urldecode($id);
 	$sql = "select * FROM chzb_epg where status=1 AND FIND_IN_SET('$id',content)";
 	$result = mysqli_query($GLOBALS['conn'],"select * FROM chzb_epg where FIND_IN_SET('$id',content)");
