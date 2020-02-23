@@ -73,7 +73,7 @@ if(isset($_POST['deleteadmin'])){
 	}else {
 	    foreach ($_POST['adminname'] as $name) {
 			if($name<>'admin'){
-				mysqli_query($con,"delete from chzb_admin where name='$name'");
+				mysqli_query($GLOBALS['conn'],"delete from chzb_admin where name='$name'");
 				echo"<script>showindex=5;alert('管理员[$name]已删除！');</script>";
 			}else{
 				if ($name=="admin") {
@@ -163,7 +163,7 @@ if(isset($_POST['submit'])&&isset($_POST['adtext'])){
 
 $userdata="";
 if(isset($_POST['submitexport'])){
-	$result=mysqli_query($con,"select name,deviceid,mac,model,author,exp,marks,status from chzb_users where status>-1");
+	$result=mysqli_query($GLOBALS['conn'],"select name,deviceid,mac,model,author,exp,marks,status from chzb_users where status>-1");
 	while($row=mysqli_fetch_array($result)){
 		$userdata=$userdata.$row[0].",".$row[1].",".$row[2].",".$row[3].",".$row[4].",".$row[5].",".$row[6].",".$row[7]."\r\n";
 	}
