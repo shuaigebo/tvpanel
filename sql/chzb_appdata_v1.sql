@@ -29,7 +29,7 @@ CREATE TABLE `chzb_appdata` (
   `showtime` int(11) NOT NULL,
   `showinterval` int(11) NOT NULL,
   `needauthor` int(11) NOT NULL DEFAULT '1',
-  `splashbj` varchar(255) NOT NULL,
+  `splash` varchar(255) NOT NULL,
   `decoder` int(11) NOT NULL DEFAULT '0',
   `buffTimeOut` int(11) NOT NULL DEFAULT '10',
   `tipusernoreg` varchar(100) NOT NULL,
