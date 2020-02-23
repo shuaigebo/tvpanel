@@ -42,8 +42,8 @@ if(!empty($_POST['username'])&& !empty($_POST['password'])){
 }
 
 if(isset($_COOKIE['rememberpass'])){
-	$user=mysqli_real_escape_string($con,$_COOKIE['username']);
-	$psw=mysqli_real_escape_string($con,$_COOKIE['psw']);
+	$user=mysqli_real_escape_string($GLOBALS['conn'],$_COOKIE['username']);
+	$psw=mysqli_real_escape_string($GLOBALS['conn'],$_COOKIE['psw']);
 	$result=mysqli_query($GLOBALS['conn'],"select * from chzb_admin where name='$user'");
 	if($row=mysqli_fetch_array($result)){
     	if($psw==$row['psw']){
