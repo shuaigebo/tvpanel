@@ -16,29 +16,51 @@ if($user!='admin'){
 	exit();
 }
 
-//升级数据库
-$src1=dirname('http://'.$_SERVER['SERVER_NAME'].$_SERVER["REQUEST_URI"]).'/';
-$proxy1='sop://';
-$src1=base64_encode(gzcompress($src1));
-$proxy1=base64_encode(gzcompress($proxy1));
-mysqli_query($GLOBALS['conn'],"UPDATE chzb_proxy set src='$src1',proxy='$proxy1' where id>0 limit 1");
-
 //修改密码操作
 if(isset($_POST['submit'])&&isset($_POST['newpassword'])){
-	$username=$_POST['username'];
-	$oldpassword=md5(PANEL_MD5_KEY.$_POST['oldpassword']);
-	$newpassword=md5(PANEL_MD5_KEY.$_POST['newpassword']);
-	$result=mysqli_query($GLOBALS['conn'],"select * from chzb_admin where name='$username' and psw='$oldpassword'");
-	if(mysqli_fetch_array($result)){
-		$sql="update chzb_admin set psw='$newpassword' where name='$username'";
-		mysqli_query($GLOBALS['conn'],$sql);
-		echo"<script>showindex=4;alert('密码修改成功！');</script>";
-		mysqli_free_result($result);
+	if (empty($_POST['oldpassword']) || empty($_POST['newpassword'])) {
+	    echo"<script>showindex=5;alert('密码不能为空！');</script>";
 	}else{
-		echo"<script>showindex=4;alert('原始密码不匹配！');</script>";
-		mysqli_free_result($result);
+		$username=$_POST['username'];
+		$oldpassword=md5(PANEL_MD5_KEY.$_POST['oldpassword']);
+		$newpassword=md5(PANEL_MD5_KEY.$_POST['newpassword']);
+		$result=mysqli_query($GLOBALS['conn'],"select * from chzb_admin where name='$username' and psw='$oldpassword'");
+		if(mysqli_fetch_array($result)){
+			$sql="update chzb_admin set psw='$newpassword' where name='$username'";
+			mysqli_query($GLOBALS['conn'],$sql);
+			echo"<script>showindex=4;alert('密码修改成功！');</script>";
+			mysqli_free_result($result);
+		}else{
+			echo"<script>showindex=4;alert('原始密码不匹配！');</script>";
+			mysqli_free_result($result);
+		}
 	}
-	$url='http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
+}
+
+
+//修改安全码操作
+if(isset($_POST['submit'])&&isset($_POST['newsecret_key'])){
+	if (empty($_POST['newsecret_key']) || empty($_POST['newsecret_key_confirm'])) {
+	    echo"<script>showindex=5;alert('安全码不能为空！');</script>";
+	}else{
+		$newsecret_key_input=$_POST['newsecret_key'];
+		$newsecret_key_confirm=$_POST['newsecret_key_confirm'];
+		if($newsecret_key_input==$newsecret_key_confirm){
+			$newsecret_key=md5($_POST['newsecret_key']);
+			$sql="update chzb_config set value='$newsecret_key' where name='secret_key'";
+			mysqli_query($GLOBALS['conn'],$sql);
+			echo"<script>showindex=4;alert('安全码修改成功！');</script>";
+		}else{
+			echo"<script>showindex=4;alert('两次输入不匹配！');</script>";
+		}
+	}
+}
+
+if(isset($_POST['closesecret_key'])){
+	$needsecret_key=$_POST['closesecret_key'];
+	$sql="update chzb_config set value=NULL where name='secret_key'";
+	mysqli_query($GLOBALS['conn'],$sql);
+	echo"<script>showindex=4;alert('安全码验证已关闭！');</script>";
 }
 
 //添加管理员操作
@@ -315,20 +337,6 @@ if(isset($_POST['submitcloseauthor'])){
 }
 
 //初始化
-$result=mysqli_query($GLOBALS['conn'],"SELECT src,proxy from chzb_proxy");
-$j=0;
-for($i=1;$i<11;$i++){
-	$src[$i]='';
-	$proxy[$i]='';
-}
-while($row=mysqli_fetch_array($result)){
-	$j++;
-	$src[$j]=gzuncompress(base64_decode($row['src']));
-	$proxy[$j]=gzuncompress(base64_decode($row['proxy']));
-}
-
-$src[1]=dirname('http://'.$_SERVER['SERVER_NAME'].$_SERVER["REQUEST_URI"]).'/';
-$proxy[1]='sop://';
 $result=mysqli_query($GLOBALS['conn'],"select dataver,appver,setver,dataurl,appurl,adtext,showtime,showinterval,splash,needauthor,decoder,buffTimeOut,tiploading,tipuserforbidden,tipuserexpired,tipusernoreg,trialdays,qqinfo from chzb_appdata");
 if($row=mysqli_fetch_array($result)){
 	$adtext=$row['adtext'];
@@ -446,7 +454,7 @@ function showli(index){
 		</ul>
 	</div>
 
-	<div class='blogbox' contenteditable="true">
+	<div class='blogbox'>
 		<br>
 		<ul>
 			<li>
@@ -658,6 +666,13 @@ function showli(index){
 				<span align="left">
 					<div class="title">修改密码</div>
 				</span>
+				<form method="post" align=center style="padding: 20px">
+					新安全码:<input type="password" name="newsecret_key" value="" size="80"><br>
+					确认新安全码:<input type="password" name="newsecret_key_confirm" value="" size="75"><br>
+					<input type="submit" name="submit" value="修改安全码">
+					<input type="submit" name="closesecret_key" value="关闭安全码认证">
+				</form>
+				<hr>
 				<form method="post" align=center style="padding: 20px">
 					用户名:<input type="text" name="username" value="admin" size="80"><br>
 					旧密码:<input type="password" name="oldpassword" value="" size="80"><br>

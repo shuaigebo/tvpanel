@@ -14,19 +14,19 @@
 -- -------------------------------------------------------
 
 --
--- 表的结构chzb_proxy
+-- 表的结构chzb_config
 --
 
-DROP TABLE IF EXISTS `chzb_proxy`;
-CREATE TABLE `chzb_proxy` (
+DROP TABLE IF EXISTS `chzb_config`;
+CREATE TABLE `chzb_config` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `src` varchar(500) NOT NULL,
-  `proxy` varchar(500) NOT NULL,
+  `name` varchar(32) NOT NULL,
+  `value` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 --
--- 转存表中的数据 chzb_proxy
+-- 转存表中的数据 chzb_config
 --
 
-INSERT INTO `chzb_proxy` VALUES('1','eJzLKCkpsNLXLy8v18ssKCmzsLDQK8kv0DcyMLQ0NDAw1QcAtMcJyA==','eJwrzi+w0tcHAAfeAes=');
+INSERT INTO `chzb_config` VALUES('1','secret_key','');

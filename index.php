@@ -1,6 +1,38 @@
 <?php
 header("Content-type: text/html; charset=utf-8");
+
+session_start();
+include_once "config.php";
+if(isset($_POST['secret_key_enter'])){
+	$secret_key=$_POST['secret_key'];
+	$secret_key=mysqli_real_escape_string($GLOBALS['conn'],$_POST['secret_key']);
+	$secret_key=md5($secret_key);
+	$result=mysqli_query($GLOBALS['conn'],"select value from chzb_config where name='secret_key'");
+	if($row=mysqli_fetch_array($result)){
+		if (empty($row['value'])){
+			$_SESSION['secret_key_status']='1';
+			unset($row);
+			mysqli_free_result($result);
+			mysqli_close($GLOBALS['conn']);
+			header("location:admin/userlogin.php");
+		}else{
+			if($secret_key==$row['value']){
+				$_SESSION['secret_key_status']='1';
+				unset($row);
+				mysqli_free_result($result);
+				mysqli_close($GLOBALS['conn']);
+				header("location:admin/userlogin.php");
+			}else{
+				echo "<script>alert('安全码错误！');</script>";
+			}
+		}
+	}
+	unset($row);
+	mysqli_free_result($result);
+	mysqli_close($GLOBALS['conn']);
+}
 ?>
+
 <html>
 	<head>
 		<title>欢迎使用肥米TV</title>
@@ -39,6 +71,11 @@ header("Content-type: text/html; charset=utf-8");
 		</script>
 	</head>
 	<body onload="startTime()">
-		当前时间：<font color="#0D0D0D"><span id="nowDateTimeSpan"></span></font> 
+		当前时间：<font color="#0D0D0D"><span id="nowDateTimeSpan"></span></font>
+		<br><br>
+		<form method="post">
+			请输入安全码：<input type="password" name="secret_key"/>
+			<input type="submit" name="secret_key_enter" value="&nbsp;&nbsp;&nbsp;进入后台&nbsp;&nbsp;&nbsp;"/>
+		</form>
 	</body>
 </html>
