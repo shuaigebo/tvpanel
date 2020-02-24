@@ -133,7 +133,10 @@ if(isset($_POST['saveauthorinfo'])){
 if(isset($_POST['submit'])&&isset($_POST['appver'])){
 	$versionname=$_POST['appver'];
 	$appurl=$_POST['appurl'];
-	$sql = "update chzb_appdata set appver='$versionname',appurl='$appurl'";
+	$up_size=$_POST["up_size"];
+	$up_sets=$_POST["up_sets"];
+	$up_text=$_POST["up_text"];
+	$sql = "update chzb_appdata set appver='$versionname',appurl='$appurl',up_size='$up_size',up_sets=$up_sets,up_text='$up_text' ";
 	mysqli_query($GLOBALS['conn'],$sql);
 	echo"<script>showindex=2;alert('APP升级设置成功！');</script>";
 }
@@ -368,12 +371,10 @@ $files = glob("../images/*.png");
 	input{margin: 10px;}
 	.adinfo{width:100%;height: 30%;}
 	.adfont{padding-bottom:5px;}
-	.bkinfo{width:100%;height: 70%;margin-top: 5px;}
-	#qqinfo{width:85%;height:30%;}
+	.bkinfo{width:100%;height: 70%;padding: 20px}
 	ul li{list-style: none}
 	hr{margin:10px;}
 	.blogbox li {
-	margin-bottom: 20px;
 	background: #f0f0f0;
 	border-radius: 5px;
 	display: list-item;
@@ -381,9 +382,8 @@ $files = glob("../images/*.png");
 	margin-top: 72px;
 	margin-left: 92px;
 	width: 850px;	
-	height: 500px;
+	height: auto;
 	}
-	#appset{height: 650px;}
 	.blogbox li .title{
 		background: #345;padding: 5px;
 		color:#fff;
@@ -415,6 +415,7 @@ $files = glob("../images/*.png");
 		color:#fff;
 	}
 	li p{padding-left: 25px;font-size: 17px;}
+	form{margin-top: 0px;margin-bottom: 0px;margin-block-end: 0px;}
 </style>
 
 <script type="text/javascript">
@@ -428,7 +429,6 @@ function showli(index){
 	$(".leftmenu li").css("background","none");
 	$(".leftmenu").css("background","#345");
 	$($(".leftmenu li")[index]).css("background",$("#topnav").css("background-color"));
-	$("#bg").css("height","<?php echo 300+count($files)*60 ?>px");
 	showindex=index;
 }
 </script>
@@ -446,21 +446,21 @@ function showli(index){
 		</ul>
 	</div>
 
-	<div class='blogbox' >
+	<div class='blogbox' contenteditable="true">
 		<br>
 		<ul>
 			<li>
 				<span align="left">
 					<div class="title">系统公告</div>
 				</span>		
-				<form method="post" align="left" style="padding:20px">
+				<form method="post" align="left" style="padding: 20px">
 			          	<div class="adfont">系统公告：</div>
-						<TEXTAREA class="adinfo"  name="adtext"><?php echo $adtext ?></TEXTAREA>
+						<TEXTAREA style="height: 180px;" class="adinfo"  name="adtext"><?php echo $adtext ?></TEXTAREA>
 						<br><br>         
 			          	<div class="adfont">预留文字：</div>
-						<TEXTAREA class="adinfo" name="qqinfo"><?php echo $qqinfo;?></TEXTAREA>
+						<TEXTAREA style="height: 180px;" class="adinfo" name="qqinfo"><?php echo $qqinfo;?></TEXTAREA>
 						<br>
-						<div style="text-align:center;vertical-align:middel;">
+						<div style="text-align:center;vertical-align:middel;padding-top: 10px;">
 							显示时间（秒）&nbsp;&nbsp;<input type="text" name="showtime" value="<?php echo $showtime;?>" size=20>
 							显示间隔（分）<input type="text" name="showinterval" size=20 value="<?php echo $showinterval;?>" >
 							<input type="submit" name="submit" value="&nbsp;&nbsp;保&nbsp;&nbsp;存&nbsp;&nbsp;">
@@ -472,9 +472,8 @@ function showli(index){
 				<span align="left">
 					<div class="title">系统备份</div>
 				</span>
-				<form method="post" align=center style="padding:20px">
-					<TEXTAREA class="bkinfo" name="userdata"><?php echo $userdata;?></TEXTAREA>
-					<br><br>
+				<form method="post" align=center style="padding: 20px">
+					<TEXTAREA style="height: 450px;" class="bkinfo" name="userdata"><?php echo $userdata;?></TEXTAREA>
 					授权天数<input type="text" name="exp" value="365" size="5">&nbsp;&nbsp;
 					备注<input type="text" name="marks" value="" size="10">
 					<input type="submit" name="submitimportid" value="用户账号导入">
@@ -487,7 +486,7 @@ function showli(index){
 				</form>
 			</li>
 
-			<li id="appset">
+			<li>
 				<span align="left">
 					<div class="title">APP设置</div>
 				</span>
@@ -499,22 +498,22 @@ function showli(index){
 							switch ($decoder) {
 								case '0':
 									echo "<option value='0' selected=\"selected\">智能解码</option>";
-									echo "<option value='1'>IJK硬解</option>";
-									echo "<option value='2'>原生解码</option>";
+									echo "<option value='1'>硬件解码</option>";
+									echo "<option value='2'>软件解码</option>";
 									break;
 								case '1':
 									echo "<option value='0'>智能解码</option>";
-									echo "<option value='1' selected=\"selected\">IJK硬解</option>";
-									echo "<option value='2'>原生解码</option>";
+									echo "<option value='1' selected=\"selected\">硬件解码</option>";
+									echo "<option value='2'>软件解码</option>";
 									break;
 								case '2':
 									echo "<option value='0'>智能解码</option>";
-									echo "<option value='1'>IJK硬解</option>";
-									echo "<option value='2' selected=\"selected\">原生解码</option>";
+									echo "<option value='1'>硬件解码</option>";
+									echo "<option value='2' selected=\"selected\">软件解码</option>";
 									break;
 								default:
-									echo "<option value='0' selected=\"selected\">IJK硬解</option>";
-									echo "<option value='1'>原生解码</option>";
+									echo "<option value='0' selected=\"selected\">硬件解码</option>";
+									echo "<option value='1'>软件解码</option>";
 									break;
 							}
 							?>				
@@ -580,7 +579,21 @@ function showli(index){
 
 				<form method="post">
 					升级地址<input type="text" size="80" name="appurl" value="<?php echo $appurl; ?>"/><br>
-					当前版本<input type="text" size="80" name="appver" value="<?php echo $appver; ?>"/><br>
+					当前版本<input type="text" size="18" name="appver" value="<?php echo $appver; ?>"/>
+					软件大小<input type="text" size="18" name="up_size" value="<?php echo $up_size; ?>"/>
+					<?php
+						if($up_sets==1){
+							$seta="checked";
+							$setb="";
+						}else{
+							$seta="";
+							$setb="checked";
+						}
+					?>
+					强制更新<input type="radio" size="15" name="up_sets" value="1" <?php echo $seta; ?> >是
+						<input type="radio" size="15" name="up_sets" value="0" <?php echo $setb; ?> >否<br>
+					更新内容<br>
+					<textarea style="height: 135px;margin: 5px;" name="up_text" rows="10" cols="92"><?php echo $up_text; ?></textarea><br>
 					<input type="submit" name="submit" value="&nbsp;推送升级&nbsp;">
 				</form>
 
@@ -595,11 +608,11 @@ function showli(index){
 				</form>
 			</li>
 
-			<li id="bg">
+			<li>
 				<span align="left">
 					<div class="title">背景图片</div>
 				</span>		
-				<table border="1" bordercolor="#00f" style="border-collapse:collapse;margin:20px;width: 90%">
+				<table border="1" bordercolor="#00f" style="border-collapse:collapse;margin: 20px;width: 90%">
 					<tr height="35px">
 						<td>图片名称</td>
 						<td>文件时间</td>
@@ -624,7 +637,7 @@ function showli(index){
 								<td>$fsize</td>
 								<td>
 									<form method='post'>
-										<a href=\"javascript:window.open('$splashurl')\">预览</a>
+										<button type='button' onclick=\"javascript:window.open('$splashurl')\">预览</button>
 										<input type='hidden' name='file' value='$file'>
 										<input type='submit' name='submitdelbg' onclick=\"return confirm('确认删除？')\" value='删除'>
 									</form>
@@ -635,7 +648,7 @@ function showli(index){
 					?>
 					</table>
 					<font color="red">提示：图片仅支持PNG格式，不超过800KB，多张图片为随机显示。</font>
-					<form method="post" enctype="multipart/form-data">
+					<form method="post" enctype="multipart/form-data" style="padding: 20px">
 						<input type="file" name="splash" accept="image/png" />
 						<input type="submit" name="submitsplash" value="&nbsp;&nbsp;开始上传&nbsp;&nbsp;">
 					</form>
@@ -645,8 +658,7 @@ function showli(index){
 				<span align="left">
 					<div class="title">修改密码</div>
 				</span>
-				<br><br>
-				<form method="post" align=center>
+				<form method="post" align=center style="padding: 20px">
 					用户名:<input type="text" name="username" value="admin" size="80"><br>
 					旧密码:<input type="password" name="oldpassword" value="" size="80"><br>
 					新密码:<input type="password" name="newpassword" value="" size="80"><br>
@@ -659,8 +671,7 @@ function showli(index){
 					<div class="title">管理员设定</div>
 				</span>
 					<center>
-						<br><br>
-						<form method="POST">
+						<form method="POST" style="padding: 20px">
 							<table border="1" bordercolor="#00f" style="border-collapse:collapse;margin:20px">
 								<tr>
 									<td width="20px"></td>
@@ -755,13 +766,14 @@ function showli(index){
 				<span align="left">
 					<div class="title">免责声明</div>
 				</span>
-				<br><br>
+				<div style="padding: 20px;padding-top:10px;padding-bottom:30px">
 				<h3 align="center">免责声明</h3>
-				<p>1、软件支持http rtsp rtmp m3u8 flv mp4 msc p2p tvbus vjms等等的主流格式。</p>
-				<p>2、本软件仅用作个人娱乐，请勿用于从事违法犯罪活动，开发者不对使用此软件引起的问题承担任何责任。</p>
-				<p>3、如果您喜欢本软件并准备长期使用，请购买正版，支持软件开发者继续改进和增强本软件的功能。</p>
-				<p>4、本软件不保证能兼容和适用于所有 Android 平台和系统，有可能引起冲突和导致不可预测的问题出现。</p>
-				<p>5、使用本软件与管理后台平台的视为同意以上条款，如有违反相关法律法规请自行承担相应法律责任。</p>
+					<p>1、软件支持http rtsp rtmp m3u8 flv mp4 msc p2p tvbus vjms等等的主流格式。</p>
+					<p>2、本软件仅用作个人娱乐，请勿用于从事违法犯罪活动，开发者不对使用此软件引起的问题承担任何责任。</p>
+					<p>3、如果您喜欢本软件并准备长期使用，请购买正版，支持软件开发者继续改进和增强本软件的功能。</p>
+					<p>4、本软件不保证能兼容和适用于所有 Android 平台和系统，有可能引起冲突和导致不可预测的问题出现。</p>
+					<p>5、使用本软件与管理后台平台的视为同意以上条款，如有违反相关法律法规请自行承担相应法律责任。</p>
+				</div>
 			</li>
 		</ul>
 	</div>
