@@ -1,7 +1,15 @@
 <meta charset="UTF-8"> <!-- for HTML5 -->
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>IPTV管理平台</title>
-<?php include_once "../config.php";include_once "usercheck.php"; ?>
+<?php
+include_once "../config.php";include_once "usercheck.php";
+header("Expires: Wed, 1 Jan 1997 00:00:00 GMT");//内容过期时间 强制浏览器去服务器去获取数据 而不是从缓存中读取数据
+header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");//标记内容最后修改时间
+header("Cache-Control: no-store, no-cache, must-revalidate");//强制不缓存
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");//禁止本页被缓存
+header("Access-Control-Allow-Origin: *"); // Support CORS
+?>
 
 <style type="text/css">
 body{ font-family: "Microsoft YaHei", "微软雅黑", "MicrosoftJhengHei", "华文细黑", "STHeiti", "MingLiu", "Helvetica" }

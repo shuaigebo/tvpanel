@@ -6,6 +6,8 @@ define("APPS_APPNAME","");  //APP软件名
 define("APPS_PACKAGENAME","");  //APP包名
 define("JISU_API_KEY","");  //极速数据API秘钥
 define("PANEL_MD5_KEY","tvkey_");  //面板密码MD5加密秘钥
+define("MAX_SAME_IP_USER","5");  //允许相同IP登录用户最大数量
+
 
 $db_host="localhost";  //数据库服务器
 $db_user="";  //数据库帐号
