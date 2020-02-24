@@ -16,15 +16,13 @@ if(isset($_POST['login'])){
 	$model=$obj->model;
 	$nettype=$obj->nettype;
 	$appname=$obj->appname;
-	if( !empty($_SERVER['HTTP_X_REAL_IP'])){
-		$ip=$_SERVER['HTTP_X_REAL_IP'];
-	} else {
-		$ip=$_SERVER['REMOTE_ADDR'];
+	if(!empty($_SERVER['HTTP_X_REAL_IP'])){$ip=$_SERVER['HTTP_X_REAL_IP'];}else{$ip=$_SERVER['REMOTE_ADDR'];}
+	if(empty($region)){
+		$myurl='http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
+		$json=file_get_contents(dirname($myurl)."/getIpInfo.php?ip=$ip");
+		$obj=json_decode($json);
+		$region=$ipobj->data->region . $ipobj->data->city . $ipobj->data->isp;
 	}
-	$myurl='http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
-	$json=file_get_contents(dirname($myurl)."/getip.php?ip=$ip");
-	$obj=json_decode($json);
-	$region=$obj->region;
 	function genName(){
 		$name=rand(1000,999999);
 		$result = mysqli_query($GLOBALS['conn'],"SELECT * from chzb_users where name=$name");
@@ -49,7 +47,6 @@ if(isset($_POST['login'])){
 	//status=0,停用用户;
 	//status=-1,未授权用户
 	//status=999为永不到期
-	$days=0;
 	$nowtime=time();
 
 	//androidID是否匹配
@@ -60,8 +57,10 @@ if(isset($_POST['login'])){
 		$days=ceil(($row['exp']-time())/86400);
 		$status=intval($row['status']);
 		$name=$row['name'];
+		$exp=$row["exp"];  //收视期限，时间戳
+		$status2=$status;
 		if($days>0&&$status==-1){
-		$status=1;
+			$status=1;
 		}
 		//更新位置，登陆时间
 		mysqli_query($GLOBALS['conn'],"UPDATE chzb_users set region='$region',ip='$ip',lasttime=$nowtime where  deviceid='$androidid'");
@@ -87,18 +86,22 @@ if(isset($_POST['login'])){
 		if($days>0){
 			$status=-1;
 			$marks='试用';
+		}elseif($days=="-999") {
+			$status=-1;
+			$marks='免费用户';
 		}else{
 			$status=-1;
 			$marks='未授权';
 		}
+		$status2=$status;
 		$exp=strtotime(date("Y-m-d"),time())+86400*$days;
 		mysqli_query($GLOBALS['conn'],"INSERT into chzb_users (name,mac,deviceid,model,exp,ip,status,region,lasttime,marks) values($name,'$mac','$androidid','$model',$exp,'$ip',$status,'$region',$nowtime,'$marks')");
-		if($days>0&&$status==-1)$status=1; 
+		if($days>0&&$status==-1)$status=1;
 	}
 	unset($row);
 	mysqli_free_result($result);
 
-	$sql = "SELECT dataver,appver,setver,adtext,qqinfo,showtime,showinterval,dataurl,appurl,decoder,buffTimeOut,tiploading,tipusernoreg,tipuserexpired,tipuserforbidden,needauthor,autoupdate,randkey,updateinterval FROM chzb_appdata";
+	$sql = "SELECT dataver,appver,setver,adtext,qqinfo,showtime,showinterval,dataurl,appurl,decoder,buffTimeOut,tiploading,tipusernoreg,tipuserexpired,tipuserforbidden,needauthor,autoupdate,randkey,updateinterval,trialdays FROM chzb_appdata";
 	$result = mysqli_query($GLOBALS['conn'],$sql);
 	if($row = mysqli_fetch_array($result)) {
 		$dataver=$row['dataver'];
@@ -118,14 +121,15 @@ if(isset($_POST['login'])){
 		$autoupdate=$row['autoupdate'];
 		$randkey=$row['randkey'];
 		$updateinterval=$row['updateinterval'];
-		$url='http://'.$_SERVER['SERVER_NAME'].$_SERVER["REQUEST_URI"]; 
+		$url='http://'.$_SERVER['HTTP_HOST'].$_SERVER["REQUEST_URI"]; 
 		$dataurl=dirname($url)."/data.php";
 		$appUrl=$row['appurl'];
+		$isfreeuser=$row["trialdays"];   //试用的天数   -999为免费无限期试用
 	}
 	unset($row);
 	mysqli_free_result($result);
 
-	if($needauthor==0){
+	if($needauthor==0 || ($status==-1 && $isfreeuser=="-999") ){
 		$status=999;
 	}
 
@@ -134,22 +138,12 @@ if(isset($_POST['login'])){
 		$appUrl='';
 	}
 
-	$arrcanseek[]='';
-	$j=0;
-	$result=mysqli_query($GLOBALS['conn'],"SELECT src,proxy from chzb_proxy");
-	while($row=mysqli_fetch_array($result)){
-		$src[$j]=gzuncompress(base64_decode($row['src']));
-		$proxy[$j]=gzuncompress(base64_decode($row['proxy']));
-		$j++;
-	}
-	mysqli_free_result($result);
-
-	$objres= array('status' => $status, 'dataurl'=>$dataurl,'appurl'=>$appUrl,'dataver' =>$dataver,'appver'=>$appver,'setver'=>$setver,'adtext'=>$adtext,'showinterval'=>$showinterval,'categoryCount'=>0,'exp' => $days,'ip'=>$ip,'showtime'=>$showtime ,'provlist'=>$arrprov,'canseeklist'=>$arrcanseek,'id'=>$name,'decoder'=>$decoder,'buffTimeOut'=>$buffTimeOut,'tipusernoreg'=>$tipusernoreg,'tiploading'=>$tiploading,'tipuserforbidden'=>$tipuserforbidden,'tipuserexpired'=>$tipuserexpired,'qqinfo'=>$qqinfo,'arrsrc'=>$src,'arrproxy'=>$proxy,'location'=>$region,'nettype'=>$nettype,'autoupdate'=>$autoupdate,'updateinterval'=>$updateinterval,'randkey'=>$randkey);
+	$objres= array('status' => $status, 'dataurl'=>$dataurl,'appurl'=>$appUrl,'dataver' =>$dataver,'appver'=>$appver,'setver'=>$setver,'adtext'=>$adtext,'showinterval'=>$showinterval,'categoryCount'=>0,'exp' => $days,'ip'=>$ip,'showtime'=>$showtime ,'provlist'=>$arrprov,'canseeklist'=>$arrcanseek,'id'=>$name,'decoder'=>$decoder,'buffTimeOut'=>$buffTimeOut,'tipusernoreg'=>$tipusernoreg,'tiploading'=>$tiploading,'tipuserforbidden'=>$tipuserforbidden,'tipuserexpired'=>$tipuserexpired,'qqinfo'=>$qqinfo,'arrsrc'=>$src,'arrproxy'=>$proxy,'location'=>$region,'nettype'=>$nettype,'autoupdate'=>$autoupdate,'updateinterval'=>$updateinterval,'randkey'=>$randkey,'exps'=>$exp,'stus'=>$status2);
 	$objres=str_replace("\\/", "/", json_encode($objres,JSON_UNESCAPED_UNICODE));
 	$key=substr($key,5,16);
 	$aes2 = new Aes($key);
 	$encrypted =$aes2->encrypt($objres);
-	unset($arrprov,$objres);
+	unset($objres);
 
 	echo $encrypted;
 	mysqli_close($GLOBALS['conn']);

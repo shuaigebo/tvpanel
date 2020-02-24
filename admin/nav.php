@@ -1,7 +1,7 @@
 <meta charset="UTF-8"> <!-- for HTML5 -->
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>IPTV管理平台</title>
-<?php include_once "../config.php";include_once "val.php"; ?>
+<?php include_once "../config.php";include_once "usercheck.php"; ?>
 
 <style type="text/css">
 body{ font-family: "Microsoft YaHei", "微软雅黑", "MicrosoftJhengHei", "华文细黑", "STHeiti", "MingLiu", "Helvetica" }
