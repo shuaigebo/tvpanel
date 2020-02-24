@@ -18,6 +18,12 @@ if(isset($_POST['secret_key_enter'])){
 		}else{
 			if($secret_key==$row['value']){
 				$_SESSION['secret_key_status']='1';
+				if(isset($_POST['remembersecret_key'])){
+					setcookie("secret_key",$row['value'],time()+3600*24*7);
+					setcookie("remembersecret_key","1",time()+3600*24*7);
+				}else{
+					setcookie("remembersecret_key","1",time()-3600);
+				}
 				unset($row);
 				mysqli_free_result($result);
 				mysqli_close($GLOBALS['conn']);
@@ -26,6 +32,24 @@ if(isset($_POST['secret_key_enter'])){
 				echo "<script>alert('安全码错误！');</script>";
 			}
 		}
+	}else{
+		echo "<script>alert('数据库没找到安全码字段！');</script>";
+	}
+	unset($row);
+	mysqli_free_result($result);
+	mysqli_close($GLOBALS['conn']);
+}
+
+if(isset($_COOKIE['remembersecret_key'])){
+	$secret_key=mysqli_real_escape_string($GLOBALS['conn'],$_COOKIE['secret_key']);
+	$result=mysqli_query($GLOBALS['conn'],"select value from chzb_config where name='secret_key'");
+	$row=mysqli_fetch_array($result);
+	if($secret_key==$row['value']){
+			$_SESSION['secret_key_status']='1';
+			unset($row);
+			mysqli_free_result($result);
+			mysqli_close($GLOBALS['conn']);
+			header("location:admin/userlogin.php");
 	}
 	unset($row);
 	mysqli_free_result($result);
@@ -75,6 +99,7 @@ if(isset($_POST['secret_key_enter'])){
 		<br><br>
 		<form method="post">
 			请输入安全码：<input type="password" name="secret_key"/>
+			<input class="check" type="checkbox" value="1" name="remembersecret_key">记住7天
 			<input type="submit" name="secret_key_enter" value="&nbsp;&nbsp;&nbsp;进入后台&nbsp;&nbsp;&nbsp;"/>
 		</form>
 	</body>
