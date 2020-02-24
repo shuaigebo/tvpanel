@@ -21,7 +21,7 @@ DROP TABLE IF EXISTS `chzb_admin`;
 CREATE TABLE `chzb_admin` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(16) NOT NULL,
-  `psw` varchar(16) NOT NULL,
+  `psw` varchar(32) NOT NULL,
   `showcounts` tinyint(4) NOT NULL DEFAULT '20',
   `useradmin0` tinyint(4) NOT NULL DEFAULT '0',
   `useradmin1` tinyint(4) NOT NULL DEFAULT '0',
