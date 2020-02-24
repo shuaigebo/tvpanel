@@ -136,7 +136,10 @@ if(isset($_GET['pd'])){
 	$result=mysqli_query($GLOBALS['conn'],"SELECT name from $categoryname order by id");
 	if($row=mysqli_fetch_array($result)){
 		$pd=$row['name'];
+		unset($row);
+		mysqli_free_result($result);
 	}else{
+		mysqli_free_result($result);
 		$pd='';
 	}
 }
