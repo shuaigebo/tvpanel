@@ -3,7 +3,7 @@ ini_set('display_errors',1);
 ini_set('display_startup_errors',1); 
 error_reporting(E_ERROR);
 
-include_once"aes.php";
+include_once "aes.php";
 include_once "config.php";
 
 if(isset($_POST['login'])){
@@ -32,7 +32,7 @@ if(isset($_POST['login'])){
 			$myurl='http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
 			$json=file_get_contents(dirname($myurl)."/getIpInfo.php?ip=$ip");
 			$obj=json_decode($json);
-			$region=$ipobj->data->region . $ipobj->data->city . $ipobj->data->isp;
+			$region=$obj->data->region . $obj->data->city . $obj->data->isp;
 		}
 		function genName(){
 			$name=rand(1000,999999);
