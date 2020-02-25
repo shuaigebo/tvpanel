@@ -337,7 +337,7 @@ if(isset($_POST['submitcloseauthor'])){
 }
 
 //初始化
-$result=mysqli_query($GLOBALS['conn'],"select dataver,appver,setver,dataurl,appurl,adtext,showtime,showinterval,splash,needauthor,decoder,buffTimeOut,tiploading,tipuserforbidden,tipuserexpired,tipusernoreg,trialdays,qqinfo from chzb_appdata");
+$result=mysqli_query($GLOBALS['conn'],"select dataver,appver,setver,dataurl,appurl,adtext,showtime,showinterval,splash,needauthor,decoder,buffTimeOut,tiploading,tipuserforbidden,tipuserexpired,tipusernoreg,trialdays,qqinfo,up_size,up_sets,up_text from chzb_appdata");
 if($row=mysqli_fetch_array($result)){
 	$adtext=$row['adtext'];
 	$dataver=$row['dataver'];
@@ -357,9 +357,15 @@ if($row=mysqli_fetch_array($result)){
 	$tipuserforbidden=$row['tipuserforbidden'];
 	$trialdays=$row['trialdays'];
   	$qqinfo=$row['qqinfo'];
+  	$up_size=$row["up_size"];
+  	$up_sets=$row["up_sets"];
+  	$up_text=$row["up_text"];
+
 }else{
 	$adtext="";
 }
+unset($row);
+mysqli_free_result($result);
 
 if($needauthor==1){
 	$closeauthor="关闭授权";
