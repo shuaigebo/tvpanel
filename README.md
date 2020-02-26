@@ -43,7 +43,7 @@ http://{域名}/
 ## 捐赠
 ![image](https://github.com/GaHoKwan/tvpanel/raw/master/wechat-pay.png)
 
-## 客户端对接（提示：act3.php -> active.php  ， login3.php -> login.php）
-- 无教程，如需指导搭建请扫码联系微信，有偿服务。
+## 客户端对接（提示：骆驼壳 login3.php -> login.php）
+- 无教程，如需指导搭建或需要专用客户端，请扫码联系微信购买。
 
 ![image](https://github.com/GaHoKwan/tvpanel/raw/master/wechat.jpeg)
