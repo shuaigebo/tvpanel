@@ -21,8 +21,5 @@ if(isset($id) && !empty($id)){
 	$playurl=$outobj['body']['urlInfo']['url'];
     header('location:'.urldecode($playurl));
 	exit;
-}else{
-	header('HTTP/1.0 404 Not Found');
-	echo 'No ID in PATH2.';
 }
 ?>
