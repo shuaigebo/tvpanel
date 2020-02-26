@@ -7,37 +7,9 @@
 
 include_once "nav.php";
 
-mysqli_query($GLOBALS['conn'],"alter table chzb_appdata add column autoupdate int DEFAULT 1;");
-mysqli_query($GLOBALS['conn'],"alter table chzb_appdata add column updateinterval int DEFAULT 15;");
-mysqli_query($GLOBALS['conn'],"alter table chzb_category add column psw varchar(16) DEFAULT '';");
-
 if($_SESSION['channeladmin']==0){
 	echo"<script>alert('你无权访问此页面！');history.go(-1);</script>";
 	exit();
-}
-
-function echoJSON($category){
-	$sql = "SELECT name,url FROM chzb_channels where category='$category' order by id";
-	$result = mysqli_query($GLOBALS['conn'],$sql);
-	while($row = mysqli_fetch_array($result)) {
-		if(!in_array($row['name'],$nameArray)){
-			$nameArray[]=$row['name'];
-		}	
-		$sourceArray[$row['name']][]=$row['url'];
-	}
-	unset($row);
-	mysqli_free_result($result);
-	$objCategory=(Object)null;
-	$objChannel=(Object)null;
-	for($i=0;$i<count($nameArray);$i++) {
-		$objChannel=(Object)null;
-		$objChannel->name=$nameArray[$i];
-		$objChannel->source=$sourceArray[$nameArray[$i]];
-		$channelArray[]=$objChannel;
-	}
-	$objCategory->$category=$channelArray;
-	unset($nameArray,$sourceArray);
-	return $objCategory;
 }
 
 ?>
@@ -104,36 +76,38 @@ ini_set('display_startup_errors',1);
 error_reporting(E_ERROR);
 
 //对分类进行重新排序
+
+$categorytype=$_GET['categorytype'];
+
+function sort_id(){
 $numCount=1;
-$categoryname="chzb_category";
-function type_sort($categoryname,$numCount){
-$result=mysqli_query($GLOBALS['conn'],"SELECT * from $categoryname order by id");
+$result=mysqli_query($GLOBALS['conn'],"SELECT * from chzb_category order by id");
 while ($row=mysqli_fetch_array($result)) {
 		$name=$row['name'];
-		mysqli_query($GLOBALS['conn'],"UPDATE $categoryname set id=$numCount where name='$name'");
+		mysqli_query($GLOBALS['conn'],"UPDATE chzb_category set id=$numCount where name='$name'");
 		unset($name);
 		$numCount++;
 	}
 	unset($row);
 	mysqli_free_result($result);
-} 
+}
+sort_id();
 
 //检测上下移的ID参数是否存在
-function chk_sort_id($table,$id){
-		$result=mysqli_query($GLOBALS['conn'],"SELECT * from $table where id=".$id);
-	if (mysqli_num_rows($result)) {
-		mysqli_free_result($result);
-			return true;
+function chk_sort_id(){
+	global $categorytype,$minid,$maxid;
+	$result=mysqli_query($GLOBALS['conn'],"SELECT min(id),max(id) from chzb_category where type='$categorytype'");
+	if($row=mysqli_fetch_array($result)){
+		$minid=$row['min(id)'];
+		$maxid=$row['max(id)'];
 	}
-	mysqli_free_result($result);
-	return false;
-} 
-
+}
+chk_sort_id();
 
 if(isset($_GET['pd'])){
 	$pd=$_GET['pd'];
 }else{
-	$result=mysqli_query($GLOBALS['conn'],"SELECT name from $categoryname order by id");
+	$result=mysqli_query($GLOBALS['conn'],"SELECT name from chzb_category order by id");
 	if($row=mysqli_fetch_array($result)){
 		$pd=$row['name'];
 		unset($row);
@@ -191,7 +165,7 @@ if(isset($_GET['pd'])){
 		if($category==""){
 			echo "<script>alert('类别名称不能为空');</script>";
 		}else{
-			$result=mysqli_query($GLOBALS['conn'],"SELECT max(id) from $categoryname");
+			$result=mysqli_query($GLOBALS['conn'],"SELECT max(id) from chzb_category");
 			if($row=mysqli_fetch_array($result)){			
 				if($row[0]>0){
 					$numCount=$row[0]+1;
@@ -199,14 +173,14 @@ if(isset($_GET['pd'])){
 			}
 			unset($row);
 			mysqli_free_result($result);
-			$sql = "SELECT name FROM $categoryname where name='$category'";
+			$sql = "SELECT name FROM chzb_category where name='$category'";
 			$result = mysqli_query($GLOBALS['conn'],$sql);
 			if(mysqli_fetch_array($result)){
 				mysqli_free_result($result);
 				echo "<script>showindex=$showindex;alert('该栏目已经存在');</script>";
 			}else{
-				mysqli_query($GLOBALS['conn'],"INSERT INTO $categoryname (id,name,psw) VALUES ($numCount,'$category','$cpass')");
-				$result=mysqli_query($GLOBALS['conn'],"SELECT * from $categoryname");
+				mysqli_query($GLOBALS['conn'],"INSERT INTO chzb_category (id,name,psw,type) VALUES ($numCount,'$category','$cpass','$categorytype')");
+				$result=mysqli_query($GLOBALS['conn'],"SELECT * from chzb_category");
 				$showindex=mysqli_num_rows($result)-1;
 				echo "<script>showindex=$showindex;alert('增加类别$category 成功');</script>";
 				$pd=$category;
@@ -221,16 +195,15 @@ if(isset($_GET['pd'])){
 		if($category==""){
 				echo "<script>alert('类别名称不能为空');</script>";
 		}else{
-			$result=mysqli_query($GLOBALS['conn'],"SELECT id from $categoryname where name='$category'");
+			$result=mysqli_query($GLOBALS['conn'],"SELECT id from chzb_category where name='$category'");
 			if($row=mysqli_fetch_array($result)){
 				$categoryid=$row[0];
-				mysqli_query($GLOBALS['conn'],"UPDATE $categoryname set id=id-1 where id>$categoryid");
+				mysqli_query($GLOBALS['conn'],"UPDATE chzb_category set id=id-1 where id>$categoryid");
 			}
-			$sql = "delete from $categoryname where name='$category'";
+			$sql = "delete from chzb_category where name='$category'";
 			mysqli_query($GLOBALS['conn'],$sql);	
 			mysqli_query($GLOBALS['conn'],"delete from chzb_channels where category='$category'");
-			//执行更新排序
-			type_sort($categoryname,$numCount);
+			sort_id();
 			echo "<script>showindex=$showindex-1;alert('$category 删除成功');</script>";
 		}
 	}
@@ -243,7 +216,7 @@ if(isset($_GET['pd'])){
 		if($category==""){
 			echo "<script>alert('类别名称不能为空');</script>";
 		}else{
-			mysqli_query($GLOBALS['conn'],"update $categoryname set name='$category',psw='$cpass' where name='$category0'");
+			mysqli_query($GLOBALS['conn'],"update chzb_category set name='$category',psw='$cpass' where name='$category0'");
 			mysqli_query($GLOBALS['conn'],"UPDATE chzb_channels set category='$category' where category='$category0'");
 			echo "<script>showindex=$showindex;alert('$category 修改成功');</script>";
 			$pd=$category;
@@ -253,17 +226,13 @@ if(isset($_GET['pd'])){
 	if(isset($_POST['submit_moveup'])&&isset($_POST['category'])){
 		$category=$_POST['category'];
 		$showindex=$_POST['showindex'];
-		$result=mysqli_query($GLOBALS['conn'],"SELECT id from $categoryname where name='$category'");
+		$result=mysqli_query($GLOBALS['conn'],"SELECT id from chzb_category where name='$category'");
 		if($row=mysqli_fetch_array($result)){
 			$id=$row['id'];
-			if(!($id==1)){
-				$preid=$id-1;
-				if (chk_sort_id($categoryname,$preid)) {
-				mysqli_query($GLOBALS['conn'],"update $categoryname set id=id+1	where id=$preid");	
-				mysqli_query($GLOBALS['conn'],"update $categoryname set id=id-1	where name='$category'");
-				}else {
-					echo "<script>alert('已经上移到最顶了！！')</script>";
-				}
+			$preid=$id-1;
+			if($preid >= $minid){
+				mysqli_query($GLOBALS['conn'],"update chzb_category set id=id+1	where id=$preid and type='$categorytype'");	
+				mysqli_query($GLOBALS['conn'],"update chzb_category set id=id-1	where name='$category' and type='$categorytype'");
 				unset($row);
 				mysqli_free_result($result);
 				echo "<script>showindex=$showindex-1;</script>";
@@ -276,13 +245,13 @@ if(isset($_GET['pd'])){
 	if(isset($_POST['submit_movedown'])&&isset($_POST['category'])){
 		$category=$_POST['category'];
 		$showindex=$_POST['showindex'];
-		$result=mysqli_query($GLOBALS['conn'],"SELECT id from $categoryname where name='$category'");
+		$result=mysqli_query($GLOBALS['conn'],"SELECT id from chzb_category where name='$category'");
 		if($row=mysqli_fetch_array($result)){
-			$id=$row['id'];	
+			$id=$row['id'];
 			$nextid=$id+1;
-			if(mysqli_fetch_array(mysqli_query($GLOBALS['conn'],"SELECT id from $categoryname where id=$nextid"))){
-				mysqli_query($GLOBALS['conn'],"update $categoryname set id=id-1	where id=$nextid");	
-				mysqli_query($GLOBALS['conn'],"update $categoryname set id=id+1	where name='$category'");
+			if($nextid <= $maxid){
+				mysqli_query($GLOBALS['conn'],"update chzb_category set id=id-1	where id=$nextid and type='$categorytype'");
+				mysqli_query($GLOBALS['conn'],"update chzb_category set id=id+1	where name='$category' and type='$categorytype'");
 				unset($row);
 				mysqli_free_result($result);
 				echo "<script>showindex=$showindex+1;</script>";
@@ -296,11 +265,11 @@ if(isset($_GET['pd'])){
 	
 	if(isset($_POST['submit_movetop'])&&isset($_POST['category'])){
 		$category=$_POST['category'];
-		$result=mysqli_query($GLOBALS['conn'],"SELECT Min(id) from $categoryname");
+		$result=mysqli_query($GLOBALS['conn'],"SELECT Min(id) from chzb_category where type='$categorytype'");
 		if($row=mysqli_fetch_array($result)){
 			$id=$row[0]-1;				
-			mysqli_query($GLOBALS['conn'],"update $categoryname set id=$id	where name='$category'");
-			mysqli_query($GLOBALS['conn'],"update $categoryname set id=id+1");
+			mysqli_query($GLOBALS['conn'],"update chzb_category set id=$id	where name='$category'");
+			sort_id();
 			echo "<script>showindex=0;</script>";
 		}
 		mysqli_free_result($result);
@@ -319,9 +288,9 @@ if(isset($_GET['pd'])){
 	}
 
 	if(isset($_POST['checkpdname'])){ 
-		mysqli_query($GLOBALS['conn'],"UPDATE $categoryname set enable=0");
+		mysqli_query($GLOBALS['conn'],"UPDATE chzb_category set enable=0");
 		foreach ($_POST['enable'] as $pdenable) {				
-			mysqli_query($GLOBALS['conn'],"UPDATE $categoryname set enable=1 where name='$pdenable'");		 	 
+			mysqli_query($GLOBALS['conn'],"UPDATE chzb_category set enable=1 where name='$pdenable'");		 	 
 		}
 	}
 
@@ -390,7 +359,7 @@ border-bottom: :0px solid #a0c6e5;">
 		<center>
 			<ul id="pdlist">
 				<?php
-					$sql = "SELECT name,psw,enable FROM $categoryname order by id";
+					$sql = "SELECT name,psw,enable FROM chzb_category where type='$categorytype' order by id";
 					$result = mysqli_query($GLOBALS['conn'],$sql);
 					$index=0;
 					while($row = mysqli_fetch_array($result)) {
@@ -411,7 +380,7 @@ border-bottom: :0px solid #a0c6e5;">
 						echo "<li>
 							<a href='#' onclick=\"showlist($index)\">
 								<div class='pdlist' style='text-align:left;padding-left:25px;padding-top:5px;padding-bottom:5px;'>
-									<input width='20px' type='checkbox' $check onclick='togglepdcheck(\"$pdname\",\"$categoryname\")'/>					
+									<input width='20px' type='checkbox' $check onclick='togglepdcheck(\"$pdname\",\"chzb_category\")'/>					
 									$pdname $lockimg 
 								</div>
 							</a>
@@ -471,5 +440,3 @@ border-bottom: :0px solid #a0c6e5;">
 <script type="text/javascript">
 	showlist(showindex);
 </script>
-
-

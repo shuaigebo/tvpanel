@@ -1,13 +1,8 @@
 <?php
 header("Content-Type:application/json;chartset=uft-8");
-define('SELF', pathinfo(__file__, PATHINFO_BASENAME));
-define('FCPATH', str_replace("\\", "/", str_replace(SELF, '', __file__)));
-ini_set('display_errors',1);            
-ini_set('display_startup_errors',1);   
-error_reporting(E_ERROR);
-include "curl.class.php";
-include "caches.class.php";
-include "../config.php";
+include_once "proxy_chk.php";
+include_once "curl.class.php";
+include_once "caches.class.php";javascript:;
 mysqli_query($GLOBALS['conn'],"SET NAMES 'UTF8'");
 
 $cachedir="./cache";

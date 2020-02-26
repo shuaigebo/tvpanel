@@ -12,7 +12,8 @@ $url="http://ip.taobao.com/service/getIpInfo.php?ip=$ip";
 retry:
 $curl = curl_init();
 curl_setopt($curl, CURLOPT_URL, $url);
-curl_setopt($curl, CURLOPT_TIMEOUT, 5);
+curl_setopt($curl, CURLOPT_TIMEOUT, 2);
+curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 5);
 curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
 $curljson = curl_exec($curl);
 curl_close($curl);

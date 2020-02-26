@@ -23,6 +23,7 @@ CREATE TABLE `chzb_category` (
   `name` varchar(16) NOT NULL,
   `enable` tinyint(4) NOT NULL DEFAULT '1',
   `psw` varchar(16) DEFAULT '',
+  `type` varchar(16) NOT NULL DEFAULT 'default',
   UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -30,5 +31,5 @@ CREATE TABLE `chzb_category` (
 -- 转存表中的数据 chzb_category
 --
 
-INSERT INTO `chzb_category` VALUES('1','默认频道','1','');
-INSERT INTO `chzb_category` VALUES('2','隐藏频道','1','12345');
+INSERT INTO `chzb_category` VALUES('1','默认频道','1','','default');
+INSERT INTO `chzb_category` VALUES('2','隐藏频道','1','','vip');

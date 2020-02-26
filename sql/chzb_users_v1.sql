@@ -33,7 +33,7 @@ CREATE TABLE `chzb_users` (
   `status` int(11) NOT NULL DEFAULT '-1',
   `lasttime` int(11) NOT NULL,
   `marks` varchar(100) NOT NULL,
-  `vip` int(11) DEFAULT '0',
+  `isvip` int(11) DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `mac` (`mac`,`deviceid`,`model`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;

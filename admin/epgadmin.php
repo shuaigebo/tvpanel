@@ -217,6 +217,8 @@ if ($_GET["act"]=="edit") {
 		mysqli_free_result($result);
 		exit("<script>javascript:alert('对不起，暂时没有节目信息，无法生成!');self.location=document.referrer;</script>");
 	}
+	//初始化
+	
 ?>
 
 <script type="text/javascript">
@@ -245,7 +247,6 @@ function quanxuan(a){
 		<?php
 		while ($r=mysqli_fetch_array($result,MYSQLI_ASSOC)) {
 			$nan=$r["name"];
-			//if (strpos($ca,$nan) !==false) {
 			if(in_array($nan,explode(',', $ca))){
 				echo "<div style=' float: left;background: #7fff00; margin-right: 3px; margin-bottom: 3px; padding: 2px 5px;'><input type='checkbox' value='".$nan."' name='ids[]'  checked=\"checked\">".$nan."</div>";
 			}else {

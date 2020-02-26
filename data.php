@@ -43,10 +43,19 @@ if(isset($_POST['data'])){
 	$nettype=$obj->nettype;
 	$appname=$obj->appname;
 	$randkey=$obj->rand;
+	
+    $sql = "SELECT isvip FROM chzb_users where deviceid='$androidid'";
+    $result = mysqli_query($GLOBALS['conn'], $sql);
+    if ($row = mysqli_fetch_array($result)) {
+        $isvip = $row['isvip'];
+    }else{
+    	$isvip = '0';
+	}
+	
 	$contents[]= echoJSON($pdname,"我的收藏",''); 
 
-	//添加频道数据
-	$sql = "SELECT name,id,psw FROM chzb_category where enable=1 order by id";
+	//添加默认频道
+	$sql = "SELECT name,id,psw FROM chzb_category where enable=1 and type='default' order by id";
 	$result = mysqli_query($GLOBALS['conn'],$sql);
 	while($row = mysqli_fetch_array($result)) {
 		$pdname=$row['name'];
@@ -55,6 +64,20 @@ if(isset($_POST['data'])){
 	}
 	unset($row);
 	mysqli_free_result($result);
+	
+	//添加会员频道
+	if ($isvip == '1') {
+		$sql = "SELECT name,id,psw FROM chzb_category where enable=1 and type='vip' order by id";
+		$result = mysqli_query($GLOBALS['conn'],$sql);
+		while($row = mysqli_fetch_array($result)) {
+			$pdname=$row['name'];
+			$psw=$row['psw'];
+			$contents[]= echoJSON($pdname,$pdname,$psw); 
+		}
+		unset($row);
+		mysqli_free_result($result);
+	}
+	
 	$str=json_encode($contents,JSON_UNESCAPED_UNICODE);
 	$str=stripslashes($str);
 	$str=base64_encode(gzcompress($str));

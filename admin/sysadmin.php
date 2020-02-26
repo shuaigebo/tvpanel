@@ -114,20 +114,15 @@ if(isset($_POST['deleteadmin'])){
 //设置管理员权限
 if(isset($_POST['saveauthorinfo'])){
 	if ( !empty($_POST['adminname'])) {
-		mysqli_query($GLOBALS['conn'],"UPDATE chzb_admin set useradmin0=0,useradmin1=0,useradmin2=0,ipcheck=0,epgadmin=0,channeladmin=0 where name<>'admin'");
-		if ( !empty($_POST['useradmin0'])) {
-			foreach ($_POST['useradmin0'] as $adminname){
-				mysqli_query($GLOBALS['conn'],"UPDATE chzb_admin set useradmin0=1 where name='$adminname'");
+		mysqli_query($GLOBALS['conn'],"UPDATE chzb_admin set author=0,useradmin=0,ipcheck=0,epgadmin=0,channeladmin=0 where name<>'admin'");
+		if ( !empty($_POST['author'])) {
+			foreach ($_POST['author'] as $adminname){
+				mysqli_query($GLOBALS['conn'],"UPDATE chzb_admin set author=1 where name='$adminname'");
 			}
 		}
-		if ( !empty($_POST['useradmin1'])) {
-			foreach ($_POST['useradmin1'] as $adminname){
-				mysqli_query($GLOBALS['conn'],"UPDATE chzb_admin set useradmin1=1 where name='$adminname'");
-			}
-		}
-		if ( !empty($_POST['useradmin2'])) {
-			foreach ($_POST['useradmin2'] as $adminname){
-				mysqli_query($GLOBALS['conn'],"UPDATE chzb_admin set useradmin2=1 where name='$adminname'");
+		if ( !empty($_POST['useradmin'])) {
+			foreach ($_POST['useradmin'] as $adminname){
+				mysqli_query($GLOBALS['conn'],"UPDATE chzb_admin set useradmin=1 where name='$adminname'");
 			}
 		}
 		if ( !empty($_POST['ipcheck'])) {
@@ -196,7 +191,8 @@ if(isset($_POST['submit'])&&isset($_POST['adtext'])){
 	$showtime=$_POST['showtime'];
 	$showinterval=$_POST['showinterval'];
 	$qqinfo=$_POST['qqinfo'];
-	$sql="update chzb_appdata set adtext='$adtext',showtime=$showtime,showinterval=$showinterval,qqinfo='$qqinfo'";
+	if(isset($_POST['showwea'])){$showwea=1;}else{$showwea=0;}
+	$sql="update chzb_appdata set adtext='$adtext',showtime=$showtime,showinterval=$showinterval,qqinfo='$qqinfo',showwea=$showwea";
 	mysqli_query($GLOBALS['conn'],$sql);
 	echo"<script>showindex=0;alert('公告修改成功！');</script>";
 }
@@ -337,7 +333,7 @@ if(isset($_POST['submitcloseauthor'])){
 }
 
 //初始化
-$result=mysqli_query($GLOBALS['conn'],"select dataver,appver,setver,dataurl,appurl,adtext,showtime,showinterval,splash,needauthor,decoder,buffTimeOut,tiploading,tipuserforbidden,tipuserexpired,tipusernoreg,trialdays,qqinfo,up_size,up_sets,up_text from chzb_appdata");
+$result=mysqli_query($GLOBALS['conn'],"select dataver,appver,setver,dataurl,appurl,adtext,showtime,showinterval,splash,needauthor,decoder,buffTimeOut,tiploading,tipuserforbidden,tipuserexpired,tipusernoreg,trialdays,qqinfo,up_size,up_sets,up_text,showwea from chzb_appdata");
 if($row=mysqli_fetch_array($result)){
 	$adtext=$row['adtext'];
 	$dataver=$row['dataver'];
@@ -360,6 +356,7 @@ if($row=mysqli_fetch_array($result)){
   	$up_size=$row["up_size"];
   	$up_sets=$row["up_sets"];
   	$up_text=$row["up_text"];
+	$showwea=$row['showwea'];
 
 }else{
 	$adtext="";
@@ -371,6 +368,12 @@ if($needauthor==1){
 	$closeauthor="关闭授权";
 }else{
 	$closeauthor="开启授权";
+}
+
+if($showwea==1){
+	$showwea='checked="checked"';
+}else{
+	$showwea="";
 }
 
 // 创建目录
@@ -388,15 +391,16 @@ $files = glob("../images/*.png");
 	.bkinfo{width:100%;height: 70%;padding: 20px}
 	ul li{list-style: none}
 	hr{margin:10px;}
+	.blogbox ul {display: flex;align-items: center;justify-content: center;}
 	.blogbox li {
 	background: #f0f0f0;
 	border-radius: 5px;
-	display: list-item;
-	text-align: center;
-	margin-top: 72px;
+	margin-top: 35px;
 	margin-left: 92px;
 	width: 850px;	
 	height: auto;
+	display: list-item;
+	text-align: center;
 	}
 	.blogbox li .title{
 		background: #345;padding: 5px;
@@ -447,7 +451,6 @@ function showli(index){
 }
 </script>
 
-<center>
 	<div class='leftmenu'>
 		<ul>
 			<li><a href="#" onclick="showli(0)">系统公告</a></li>
@@ -477,6 +480,7 @@ function showli(index){
 						<div style="text-align:center;vertical-align:middel;padding-top: 10px;">
 							显示时间（秒）&nbsp;&nbsp;<input type="text" name="showtime" value="<?php echo $showtime;?>" size=20>
 							显示间隔（分）<input type="text" name="showinterval" size=20 value="<?php echo $showinterval;?>" >
+							显示天气&nbsp;<input type="checkbox" name="showwea" <?php echo $showwea;?> />
 							<input type="submit" name="submit" value="&nbsp;&nbsp;保&nbsp;&nbsp;存&nbsp;&nbsp;">
 						</div>
 				</form>
@@ -672,14 +676,14 @@ function showli(index){
 				<span align="left">
 					<div class="title">修改密码</div>
 				</span>
-				<form method="post" align=center style="padding: 20px">
+				<form method="post" style="padding: 20px">
 					新安全码:<input type="password" name="newsecret_key" value="" size="80"><br>
 					确认新安全码:<input type="password" name="newsecret_key_confirm" value="" size="75"><br>
 					<input type="submit" name="submit" value="修改安全码">
 					<input type="submit" name="closesecret_key" value="关闭安全码认证">
 				</form>
 				<hr>
-				<form method="post" align=center style="padding: 20px">
+				<form method="post" style="padding: 20px">
 					用户名:<input type="text" name="username" value="admin" size="80"><br>
 					旧密码:<input type="password" name="oldpassword" value="" size="80"><br>
 					新密码:<input type="password" name="newpassword" value="" size="80"><br>
@@ -698,36 +702,29 @@ function showli(index){
 									<td width="20px"></td>
 									<td width="180px">用户名</td>
 									<td width="100px">识别授权</td>
-									<td width="100px">账号授权</td>
 									<td width="100px">用户管理</td>
 									<td width="100px">异常检测</td>
 									<td width="100px">EPG管理</td>
 									<td width="100px">频道管理</td>
 								</tr>
 								<?php
-								$result=mysqli_query($GLOBALS['conn'],"select name,useradmin0,useradmin1,useradmin2,ipcheck,epgadmin,channeladmin from chzb_admin");
+								$result=mysqli_query($GLOBALS['conn'],"select name,author,useradmin,ipcheck,epgadmin,channeladmin from chzb_admin");
 								while ($row=mysqli_fetch_array($result)) {
 									$adminname=$row['name'];
-									$useradmin0=$row['useradmin0'];
-									$useradmin1=$row['useradmin1'];
-									$useradmin2=$row['useradmin2'];
+									$author=$row['author'];
+									$useradmin=$row['useradmin'];
 									$ipcheck=$row['ipcheck'];
 									$epgadmin=$row['epgadmin'];
 									$channeladmin=$row['channeladmin'];
-									if($useradmin0==1){
-										$useradmin0checked=" checked='true'";
+									if($author==1){
+										$authorchecked=" checked='true'";
 									}else{
-										$useradmin0checked="";
+										$authorchecked="";
 									}
-									if($useradmin1==1){
-										$useradmin1checked=" checked='true'";
+									if($useradmin==1){
+										$useradminchecked=" checked='true'";
 									}else{
-										$useradmin1checked="";
-									}
-									if($useradmin2==1){
-										$useradmin2checked=" checked='true'";
-									}else{
-										$useradmin2checked="";
+										$useradminchecked="";
 									}
 									if($ipcheck==1){
 										$ipcheckchecked=" checked='true'";
@@ -748,23 +745,21 @@ function showli(index){
 										echo "<tr>
 											<td width=\"20px\">⊗</td>
 											<td width=\"180px\">admin</td>
-											<td width=\"150px\"><input value='$adminname' name='useradmin0[]' type='checkbox' checked='true' disabled='true'></td>
-											<td width=\"150px\"><input value='$adminname' name='useradmin1[]' type='checkbox' checked='true' disabled='true'></td>
-											<td width=\"150px\"><input value='$adminname' name='useradmin2[]' type='checkbox' checked='true' disabled='true'></td>
-											<td width=\"150px\"><input value='$adminname' name='ipcheck[]' type='checkbox' checked='true' disabled='true'></td>
-											<td width=\"150px\"><input value='$adminname' name='epgadmin[]' type='checkbox' checked='true' disabled='true'></td>
-											<td width=\"150px\"><input value='$adminname' name='channeladmin[]' type='checkbox' checked='true' disabled='true'></td>
+											<td width=\"180px\"><input value='$adminname' name='author[]' type='checkbox' checked='true' disabled='true'></td>
+											<td width=\"180px\"><input value='$adminname' name='useradmin[]' type='checkbox' checked='true' disabled='true'></td>
+											<td width=\"180px\"><input value='$adminname' name='ipcheck[]' type='checkbox' checked='true' disabled='true'></td>
+											<td width=\"180px\"><input value='$adminname' name='epgadmin[]' type='checkbox' checked='true' disabled='true'></td>
+											<td width=\"180px\"><input value='$adminname' name='channeladmin[]' type='checkbox' checked='true' disabled='true'></td>
 										</tr>";
 									}else{
 										echo "<tr>
 											<td width=\"20px\"><input value='$adminname' name='adminname[]' type='checkbox'></td>
 											<td width=\"180px\">$adminname</td>
-											<td width=\"150px\"><input value='$adminname' name='useradmin0[]' type='checkbox' $useradmin0checked ></td>
-											<td width=\"150px\"><input value='$adminname' name='useradmin1[]' type='checkbox' $useradmin1checked ></td>
-											<td width=\"150px\"><input value='$adminname' name='useradmin2[]' type='checkbox' $useradmin2checked ></td>
-											<td width=\"150px\"><input value='$adminname' name='ipcheck[]' type='checkbox' $ipcheckchecked ></td>
-											<td width=\"150px\"><input value='$adminname' name='epgadmin[]' type='checkbox' $epgadminchecked ></td>
-											<td width=\"150px\"><input value='$adminname' name='channeladmin[]' type='checkbox' $channeladminchecked ></td>
+											<td width=\"180px\"><input value='$adminname' name='author[]' type='checkbox' $authorchecked ></td>
+											<td width=\"180px\"><input value='$adminname' name='useradmin[]' type='checkbox' $useradminchecked ></td>
+											<td width=\"180px\"><input value='$adminname' name='ipcheck[]' type='checkbox' $ipcheckchecked ></td>
+											<td width=\"180px\"><input value='$adminname' name='epgadmin[]' type='checkbox' $epgadminchecked ></td>
+											<td width=\"180px\"><input value='$adminname' name='channeladmin[]' type='checkbox' $channeladminchecked ></td>
 										</tr>";
 									}
 								}
@@ -798,7 +793,6 @@ function showli(index){
 			</li>
 		</ul>
 	</div>
-</center>
 
 <script type="text/javascript">
 showli(showindex);

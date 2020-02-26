@@ -17,9 +17,8 @@ if(!empty($_POST['username'])&& !empty($_POST['password'])){
 			$user=$row['name'];
 			$_SESSION['user']=$user;
 			$_SESSION['psw']=$row['psw']; 
-			$_SESSION['useradmin0']=$row['useradmin0'];
-			$_SESSION['useradmin1']=$row['useradmin1'];
-			$_SESSION['useradmin2']=$row['useradmin2'];
+			$_SESSION['author']=$row['author'];
+			$_SESSION['useradmin']=$row['useradmin'];
 			$_SESSION['ipcheck']=$row['ipcheck'];
 			$_SESSION['epgadmin']=$row['epgadmin'];
 			$_SESSION['channeladmin']=$row['channeladmin'];
@@ -53,9 +52,8 @@ if(isset($_COOKIE['rememberpass'])){
 		if($psw==$row['psw']){
 			$_SESSION['user']=$user;
 			$_SESSION['psw']=$psw;
-			$_SESSION['useradmin0']=$row['useradmin0'];
-			$_SESSION['useradmin1']=$row['useradmin1'];
-			$_SESSION['useradmin2']=$row['useradmin2'];
+			$_SESSION['author']=$row['author'];
+			$_SESSION['useradmin']=$row['useradmin'];
 			$_SESSION['ipcheck']=$row['ipcheck'];
 			$_SESSION['epgadmin']=$row['epgadmin'];
 			$_SESSION['channeladmin']=$row['channeladmin'];

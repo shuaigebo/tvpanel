@@ -6,6 +6,18 @@ error_reporting(E_ERROR);
 include_once "aes.php";
 include_once "config.php";
 
+if (isset($_GET['id'])) {
+    $androidid = $_GET['id'];
+    $sql = "SELECT isvip FROM chzb_users where deviceid='$androidid'";
+    $result = mysqli_query($GLOBALS['conn'], $sql);
+    if ($row = mysqli_fetch_array($result)) {
+        $isvip = $row['isvip'];
+        if ($isvip == '1') {echo 'VIP用户';} else {echo '免费用户';}
+    }else{
+    	echo '免费用户';
+	}
+}
+
 if(isset($_POST['login'])){
 
 	if(!empty($_SERVER['HTTP_X_REAL_IP'])){$ip=$_SERVER['HTTP_X_REAL_IP'];}else{$ip=$_SERVER['REMOTE_ADDR'];}
@@ -112,14 +124,16 @@ if(isset($_POST['login'])){
 		unset($row);
 		mysqli_free_result($result);
 	
-		$sql = "SELECT dataver,appver,setver,adtext,qqinfo,showtime,showinterval,dataurl,appurl,decoder,buffTimeOut,tiploading,tipusernoreg,tipuserexpired,tipuserforbidden,needauthor,autoupdate,randkey,updateinterval,trialdays FROM chzb_appdata";
+		$sql = "SELECT dataver,appver,setver,adtext,qqinfo,showtime,showinterval,dataurl,appurl,decoder,buffTimeOut,tiploading,tipusernoreg,tipuserexpired,tipuserforbidden,needauthor,autoupdate,randkey,updateinterval,trialdays,showwea FROM chzb_appdata";
 		$result = mysqli_query($GLOBALS['conn'],$sql);
 		if($row = mysqli_fetch_array($result)) {
 			$dataver=$row['dataver'];
 			$appver=$row['appver']; 
+			$setver=$row['showwea'];
 			$setver=$row['setver'];
 			$adtext=$row['adtext'];
 			$qqinfo=$row['qqinfo'];
+			$showwea=$row['showwea'];
 			$showtime=$row['showtime'];
 			$showinterval=$row['showinterval'];
 			$decoder=$row['decoder'];
@@ -143,7 +157,23 @@ if(isset($_POST['login'])){
 		if($needauthor==0 || ($status==-1 && $isfreeuser=="-999") ){
 			$status=999;
 		}
-	
+
+		if($showwea==1){
+			$api_id=WEATHER_API_ID;
+			$api_key=WEATHER_API_KEY;
+			$url="https://www.tianqiapi.com/api?version=v6&appid=$api_id&appsecret=$api_key&ip=$ip";
+			$curl = curl_init();
+			curl_setopt($curl, CURLOPT_URL, $url);
+			curl_setopt($curl, CURLOPT_TIMEOUT, 2);
+			curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 5);
+			curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+			$curljson = curl_exec($curl);
+			curl_close($curl);
+			$obj=json_decode($curljson);
+			$weather=date('n月d号') .$obj->week . '，' . $obj->city . '，' . $obj->tem . '℃'  . $obj->wea . '，' . '气温:' . $obj->tem2  . '℃' .'～' . $obj->tem1 . '℃' . '，' . $obj->win . $obj->win_speed . '，' . '相对湿度:' . $obj->humidity . '，' . '空气质量:' .  $obj->air_level . '，' . $obj->air_tips ;
+			$adtext=$weather . $adtext;
+		}
+		
 		if($status<1){
 			$dataurl='';
 			$appUrl='';
