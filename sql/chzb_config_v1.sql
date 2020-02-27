@@ -30,3 +30,4 @@ CREATE TABLE `chzb_config` (
 --
 
 INSERT INTO `chzb_config` VALUES('1','secret_key','');
+INSERT INTO `chzb_config` VALUES('2','epg_api_chk','0');

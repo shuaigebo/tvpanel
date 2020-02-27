@@ -25,6 +25,7 @@ cp .config.php config.php
 ```
 
 - 修改配置文件
+到[https://www.tianqiapi.com/](https://www.tianqiapi.com/)注册天气API
 ```
 define("APPS_APPNAME",""); //客户端软件名
 define("APPS_PACKAGENAME",""); //客户端软件包名
@@ -33,6 +34,8 @@ $db_host="";  //数据库服务器
 $db_user="";  //数据库帐号
 $db_pwd="";   //数据库密码
 $db_dabse="";  //数据库名称
+define("WEATHER_API_ID","");  //天气API_appid
+define("WEATHER_API_KEY","");  //天气API_appsecret
 ```
 
 - 登入后台 （默认用户与密码:admin,安全码：空）
@@ -43,7 +46,7 @@ http://{域名}/
 ## 捐赠
 ![image](https://github.com/GaHoKwan/tvpanel/raw/master/wechat-pay.png)
 
-## 客户端对接（提示：act3.php -> active.php  ， login3.php -> login.php）
-- 无教程，如需指导搭建请扫码联系微信，有偿服务。
+## 客户端对接（提示：骆驼壳 login3.php -> login.php）
+- 无教程，如需指导搭建或需要专用客户端，请扫码联系微信购买。
 
 ![image](https://github.com/GaHoKwan/tvpanel/raw/master/wechat.jpeg)
