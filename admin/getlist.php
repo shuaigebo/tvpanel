@@ -23,7 +23,9 @@ function echoSource($category){
 	while($row = mysqli_fetch_array($result)) {
 		echo $row['name'] .",". $row['url'] . "\n";
 	}
+	unset($row);
 	mysqli_free_result($result);
+	mysqli_close($GLOBALS['conn']);
 }
 
 if(isset($_GET['pd'])){
