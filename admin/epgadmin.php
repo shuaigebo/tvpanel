@@ -175,8 +175,28 @@ if ($_GET["act"]=="edits") {
 	mysqli_query($GLOBALS['conn'],"update chzb_epg set name='".$epg_name."',content='".$ids."',remarks='".$remarks."' where id=".$id);
 	exit("<script>javascript:alert('EPG名为 ".$epg_name." 修改成功!');self.location='epgadmin.php';</script>");
 }
-
 mysqli_free_result($result);
+
+if(isset($_POST['epg_api_chk'])){
+	if(isset($_POST['epg_api_chk_value'])){$epg_api_chk_value=1;}else{$epg_api_chk_value=0;}
+	$sql="update chzb_config set value='$epg_api_chk_value' where name='epg_api_chk'";
+	mysqli_query($GLOBALS['conn'],$sql);
+	if($epg_api_chk_value == 1){
+		echo"<script>alert('已打开EPG接口验证！');</script>";
+	}else{
+		echo"<script>alert('已关闭EPG接口验证！');</script>";
+	}
+}
+//初始化
+$result=mysqli_query($GLOBALS['conn'],"select value from chzb_config where name='epg_api_chk'");
+if($row=mysqli_fetch_array($result)){
+	$epg_api_chk_value=$row['value'];
+	if($epg_api_chk_value==1){
+		$epg_api_chk_value='checked="checked"';
+	}else{
+		$epg_api_chk_value="";
+	}
+}
 ?>
 
 <?php
@@ -217,8 +237,6 @@ if ($_GET["act"]=="edit") {
 		mysqli_free_result($result);
 		exit("<script>javascript:alert('对不起，暂时没有节目信息，无法生成!');self.location=document.referrer;</script>");
 	}
-	//初始化
-	
 ?>
 
 <script type="text/javascript">
@@ -346,6 +364,10 @@ function quanxuan(a){
 		    <form method="GET">
 				<input type="text" style="width:100px;" name="keywords" value="<?php echo $keywords;?>">
 				<input type="submit" name="submitsearch" value="搜索">
+			</form>
+		    <form method="POST">
+				&nbsp;EPG接口验证&nbsp;<input type="checkbox" name="epg_api_chk_value" <?php echo $epg_api_chk_value;?> />
+				<input type="submit" name="epg_api_chk" value="&nbsp;&nbsp;保&nbsp;&nbsp;存&nbsp;&nbsp;">
 			</form>
 		</td>
 	</tr>
