@@ -70,9 +70,9 @@ class Aes
     }
 }
 
-$sig=APPS_SIG;
-$appname=APPS_APPNAME;
-$packagename=APPS_PACKAGENAME;
+$sig=get_config('app_sign');
+$appname=get_config('app_appname');
+$packagename=get_config('app_packagename');
 $key=md5($sig.$appname.$packagename."AD80F93B542B");
 $key=md5($key.$appname.$packagename);
 ?>

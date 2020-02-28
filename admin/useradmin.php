@@ -101,12 +101,12 @@ if(isset($_POST['submitmodifymarks'])){
 
 if(isset($_POST['submitforbidden'])){
 	if (empty($_POST['id'])) {
-	    exit('<script>javascript:self.location=document.referrer;alert("请选择要停用的用户账号信息！")</script>');
+	    exit('<script>javascript:self.location=document.referrer;alert("请选择要取消授权的用户账号信息！")</script>');
 	}
 	foreach ($_POST['id'] as $id) {
-		mysqli_query($GLOBALS['conn'],"update chzb_users set status=0 where name=$id and (status=1 or status=999)");		
+		mysqli_query($GLOBALS['conn'],"update chzb_users set status=0,author='',authortime=0 where name=$id and (status=1 or status=999)");
 	}
-	exit('<script>javascript:self.location=document.referrer;alert("选中用户已停用！")</script>');
+	exit('<script>javascript:window.location.href="author.php";alert("选中用户已取消授权！")</script>');
 }
 
 if(isset($_POST['submitNotExpired'])){
@@ -127,27 +127,6 @@ if(isset($_POST['submitCancelNotExpired'])){
 		mysqli_query($GLOBALS['conn'],"update chzb_users set status=1 where name=$id and status=999");		
 	}
 	exit('<script>javascript:self.location=document.referrer;alert("选中用户已取消永不到期权限！")</script>');
-}
-
-if(isset($_POST['submitpermit'])){
-	if (empty($_POST['id'])) {
-	    exit('<script>javascript:self.location=document.referrer;alert("请选择要启用的用户账号信息！")</script>');
-	}
-	foreach ($_POST['id'] as $id) {
-		mysqli_query($GLOBALS['conn'],"update chzb_users set status=1 where name=$id and (status=0 or status=999)");		
-	}
-	exit('<script>javascript:self.location=document.referrer;alert("选中用户已启用！")</script>');	
-}
-
-if(isset($_POST['submitclear'])){
-	if (empty($_POST['id'])) {
-	    exit('<script>javascript:self.location=document.referrer;alert("请选择要清除绑定的用户账号信息！")</script>');
-	}
-	foreach ($_POST['id'] as $id) {
-		mysqli_query($GLOBALS['conn'],"update chzb_users set mac='',deviceid='',model='' where name=$id");
-		mysqli_query($GLOBALS['conn'],"delete chzb_loginrec from where userid=$id");
-	}	
-	exit('<script>javascript:self.location=document.referrer;alert("选中用户绑定信息已清除！")</script>');
 }
 
 if(isset($_POST['submitmodifyipcount'])){
@@ -390,9 +369,9 @@ mysqli_free_result($result);
 				$recStart=$recCounts*($page-1);
 				if($order!='exp')$order=$order.' desc';
 				if($user=='admin'){
-				$sql="select status,name,mac,deviceid,model,ip,region,lasttime,exp,author,marks,vpn,isvip from chzb_users where status>-1 $searchparam order by $order  limit $recStart,$recCounts";
+				$sql="select status,name,mac,deviceid,model,ip,region,lasttime,exp,author,marks,vpn,isvip from chzb_users where status>0 $searchparam order by $order  limit $recStart,$recCounts";
 				}else{
-					$sql="select status,name,mac,deviceid,model,ip,region,lasttime,exp,author,marks,vpn,isvip from chzb_users where status>-1 and author='$user' $searchparam order by $order limit $recStart,$recCounts";
+					$sql="select status,name,mac,deviceid,model,ip,region,lasttime,exp,author,marks,vpn,isvip from chzb_users where status>0 and author='$user' $searchparam order by $order limit $recStart,$recCounts";
 				}
 				$result=mysqli_query($GLOBALS['conn'],$sql);
 				if (mysqli_num_rows($result)) {
@@ -458,21 +437,14 @@ mysqli_close($GLOBALS['conn']);
 					<input type="checkbox" onclick="quanxuan(this)"><?php if($screenX < 1440){echo '<br>';}else{echo '&nbsp;';} ?>全选
 				</td>
 				<td colspan="11">
-					<input type="submit" name="submitforbidden" value="&nbsp;停&nbsp;&nbsp;用&nbsp;">
 					&nbsp;&nbsp;
-					<input type="submit" name="submitpermit" value="&nbsp;启&nbsp;&nbsp;用&nbsp;">
-					&nbsp;&nbsp;
-					<input type="submit" name="submitdel" value="&nbsp;删&nbsp;&nbsp;除&nbsp;" onclick="return confirm('确定删除选中用户吗？')">
-					&nbsp;&nbsp;
-					<input type="submit" name="submitsetvip" value="设为VIP用户">
+					<input type="submit" name="submitsetvip" value="设为VIP用户">&nbsp;&nbsp;
 					<input type="submit" name="submitclearvip" value="取消VIP用户">&nbsp;&nbsp;
-					<input type="submit" name="submitNotExpired" value="设为永不到期">
-					&nbsp;&nbsp;
-					<input type="submit" name="submitCancelNotExpired" value="取消永不到期">
-					&nbsp;&nbsp;
-					<input type="submit" name="submitdelall" value="清空过期用户" onclick="return confirm('确认删除所有已过期授权信息？')">
-					&nbsp;&nbsp;
-					<input type="submit" name="submitclear" value="设备解绑">
+					<input type="submit" name="submitNotExpired" value="设为永不到期">&nbsp;&nbsp;
+					<input type="submit" name="submitCancelNotExpired" value="取消永不到期">&nbsp;&nbsp;
+					<input type="submit" name="submitforbidden" value="&nbsp;取消授权&nbsp;">&nbsp;&nbsp;
+					<input type="submit" name="submitdel" value="&nbsp;删&nbsp;&nbsp;除&nbsp;" onclick="return confirm('确定删除选中用户吗？')">&nbsp;&nbsp;
+					<input type="submit" name="submitdelall" value="清空过期用户" onclick="return confirm('确认删除所有已过期授权信息？')">&nbsp;&nbsp;
 					<?php if($screenX < 1440){echo '<br><br>';}else{echo '&nbsp;&nbsp';} ?>
 					<input type="text" name="marks" value="已授权" size="15">
 					<input type="submit" name="submitmodifymarks" value="修改备注">

@@ -7,6 +7,14 @@ if($_SESSION['secret_key_status']!="1"){
 	exit();
 }
 include_once "../config.php";
+
+if(!empty($_SERVER['HTTP_X_REAL_IP'])){$ip=$_SERVER['HTTP_X_REAL_IP'];}else{$ip=$_SERVER['REMOTE_ADDR'];}
+$myurl='http://'.$_SERVER['HTTP_HOST'];
+$json=file_get_contents("$myurl/getIpInfo.php?ip=$ip");
+$obj=json_decode($json);
+$region=$obj->data->region . $obj->data->city . $obj->data->isp;
+$time=date("Y-m-d H:i:s");
+
 if(!empty($_POST['username'])&& !empty($_POST['password'])){
 	$user=mysqli_real_escape_string($GLOBALS['conn'],$_POST['username']);
 	$psw=mysqli_real_escape_string($GLOBALS['conn'],$_POST['password']);
@@ -29,15 +37,18 @@ if(!empty($_POST['username'])&& !empty($_POST['password'])){
 			}else{
 				setcookie("rememberpass","1",time()-3600);
 			}
-		unset($row);
-		mysqli_free_result($result);
-		mysqli_close($GLOBALS['conn']);
-		header("location:nav.php");
+			mysqli_query($GLOBALS['conn'],"INSERT into chzb_adminrec (id,name,ip,loc,time,func) values(null,'$user','$ip','$region','$time','用户登入')");
+			unset($row);
+			mysqli_free_result($result);
+			mysqli_close($GLOBALS['conn']);
+			header("location:nav.php");
 		}else{
 			echo "<script>alert('密码错误！');</script>";
+			mysqli_query($GLOBALS['conn'],"INSERT into chzb_adminrec (id,name,ip,loc,time,func) values(null,'$user','$ip','$region','$time','输入错误密码')");
 		}
 	}else{
 		echo "<script>alert('用户不存在！');</script>";
+		mysqli_query($GLOBALS['conn'],"INSERT into chzb_adminrec (id,name,ip,loc,time,func) values(null,'$user','$ip','$region','$time','尝试登陆')");
 	}
 	unset($row);
 	mysqli_free_result($result);
@@ -57,6 +68,7 @@ if(isset($_COOKIE['rememberpass'])){
 			$_SESSION['ipcheck']=$row['ipcheck'];
 			$_SESSION['epgadmin']=$row['epgadmin'];
 			$_SESSION['channeladmin']=$row['channeladmin'];
+			mysqli_query($GLOBALS['conn'],"INSERT into chzb_adminrec (id,name,ip,loc,time,func) values(null,'$user','$ip','$region','$time','用户登入')");
 			unset($row);
 			mysqli_free_result($result);
 			mysqli_close($GLOBALS['conn']);

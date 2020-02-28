@@ -177,26 +177,23 @@ if ($_GET["act"]=="edits") {
 }
 mysqli_free_result($result);
 
-if(isset($_POST['epg_api_chk'])){
-	if(isset($_POST['epg_api_chk_value'])){$epg_api_chk_value=1;}else{$epg_api_chk_value=0;}
-	$sql="update chzb_config set value='$epg_api_chk_value' where name='epg_api_chk'";
+//极速数据API
+if(isset($_POST['submit'])&&isset($_POST['jisuapi_key'])){
+	if(isset($_POST['epg_api_chk'])){$epg_api_chk=1;}else{$epg_api_chk=0;}
+	$sql="update chzb_config set value='$epg_api_chk' where name='epg_api_chk'";
 	mysqli_query($GLOBALS['conn'],$sql);
-	if($epg_api_chk_value == 1){
-		echo"<script>alert('已打开EPG接口验证！');</script>";
-	}else{
-		echo"<script>alert('已关闭EPG接口验证！');</script>";
-	}
+	$jisuapi_key=$_POST['jisuapi_key'];
+	set_config('jisuapi_key',"$jisuapi_key");
+	exit("<script>javascript:alert('设置已保存!');self.location='epgadmin.php';</script>");
 }
+
 //初始化
-$result=mysqli_query($GLOBALS['conn'],"select value from chzb_config where name='epg_api_chk'");
-if($row=mysqli_fetch_array($result)){
-	$epg_api_chk_value=$row['value'];
-	if($epg_api_chk_value==1){
-		$epg_api_chk_value='checked="checked"';
-	}else{
-		$epg_api_chk_value="";
-	}
+if(get_config('epg_api_chk')==1){
+	$epg_api_chk='checked="checked"';
+}else{
+	$epg_api_chk="";
 }
+
 ?>
 
 <?php
@@ -366,8 +363,9 @@ function quanxuan(a){
 				<input type="submit" name="submitsearch" value="搜索">
 			</form>
 		    <form method="POST">
-				&nbsp;EPG接口验证&nbsp;<input type="checkbox" name="epg_api_chk_value" <?php echo $epg_api_chk_value;?> />
-				<input type="submit" name="epg_api_chk" value="&nbsp;&nbsp;保&nbsp;&nbsp;存&nbsp;&nbsp;">
+				极速数据API_KEY&nbsp;<input type="text" name="jisuapi_key" size=15 value="<?php echo get_config('jisuapi_key');?>" >
+				&nbsp;EPG接口验证&nbsp;<input type="checkbox" name="epg_api_chk" <?php echo $epg_api_chk;?> />
+				<input type="submit" name="submit" value="&nbsp;保&nbsp;&nbsp;存&nbsp;">
 			</form>
 		</td>
 	</tr>

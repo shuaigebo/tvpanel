@@ -17,15 +17,15 @@ if(isset($_POST['submitunbind'])){
 	$result=mysqli_query($GLOBALS['conn'],"select * from chzb_users where name=$userid");
 	if(mysqli_fetch_array($result)){
 		mysqli_query($GLOBALS['conn'],"update chzb_users set mac='',deviceid='',model='' where name=$userid");
-		echo "账号$userid 解绑成功！";
+		exit('<script>javascript:self.location=document.referrer;alert("账号$userid 解绑成功！")</script>');
 	}else{
-		echo "账号不存在！";
+		exit('<script>javascript:self.location=document.referrer;alert("账号不存在！")</script>');
 	}
 }
 
 if(isset($_POST['clearvpn'])){
 	$result=mysqli_query($GLOBALS['conn'],"UPDATE chzb_users set vpn=0");
-	echo "抓包记录已清空";
+	exit('<script>javascript:self.location=document.referrer;alert("抓包记录已清空")</script>');
 }
 
 if(isset($_POST['stopuse'])){
@@ -52,6 +52,12 @@ if(isset($_POST['submitclearold'])){
 
 if(isset($_POST['submitclearall'])){
 	mysqli_query($GLOBALS['conn'],"delete from chzb_loginrec");
+}
+
+if(isset($_POST['submitsameip_user'])){
+	$sameip_user=$_POST['sameip_user'];
+	set_config('max_sameip_user',"$sameip_user");
+	echo('<script>javascript:self.location=document.referrer;alert("保存成功！")</script>');
 }
 
 //获取每日允许登陆IP数量
@@ -87,6 +93,10 @@ if($row=mysqli_fetch_array($result)){
 			<tr>
 				<td colspan="7">
 					<form method="POST">
+						允许同一个IP授权数量
+						<input type="text" name="sameip_user" size="2" value="<?php echo get_config('max_sameip_user');?>">
+						<input type="submit" name="submitsameip_user" value="保存">
+						&nbsp;&nbsp;&nbsp;&nbsp;
 						<input type="text" name="ipcount" size="5" value="<?php echo $ipcount;?>">
 						<input type="submit" name="submitmodifyipcount" value="设定IP异常数量">
 						&nbsp;&nbsp;&nbsp;&nbsp;

@@ -1,15 +1,3 @@
---
--- MySQL database dump
--- Created by DbManage class, Power By yanue. 
--- http://yanue.net 
---
--- 生成日期: 2020 年  02 月 20 日 21:40
--- MySQL版本: 5.5.62-log
--- PHP 版本: 7.2.25
-
---
--- 数据库: ``
---
 
 -- -------------------------------------------------------
 

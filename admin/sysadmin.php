@@ -28,10 +28,10 @@ if(isset($_POST['submit'])&&isset($_POST['newpassword'])){
 		if(mysqli_fetch_array($result)){
 			$sql="update chzb_admin set psw='$newpassword' where name='$username'";
 			mysqli_query($GLOBALS['conn'],$sql);
-			echo"<script>showindex=4;alert('密码修改成功！');</script>";
+			echo"<script>showindex=5;alert('密码修改成功！');</script>";
 			mysqli_free_result($result);
 		}else{
-			echo"<script>showindex=4;alert('原始密码不匹配！');</script>";
+			echo"<script>showindex=5;alert('原始密码不匹配！');</script>";
 			mysqli_free_result($result);
 		}
 	}
@@ -49,9 +49,9 @@ if(isset($_POST['submit'])&&isset($_POST['newsecret_key'])){
 			$newsecret_key=md5($_POST['newsecret_key']);
 			$sql="update chzb_config set value='$newsecret_key' where name='secret_key'";
 			mysqli_query($GLOBALS['conn'],$sql);
-			echo"<script>showindex=4;alert('安全码修改成功！');</script>";
+			echo"<script>showindex=5;alert('安全码修改成功！');</script>";
 		}else{
-			echo"<script>showindex=4;alert('两次输入不匹配！');</script>";
+			echo"<script>showindex=5;alert('两次输入不匹配！');</script>";
 		}
 	}
 }
@@ -60,13 +60,13 @@ if(isset($_POST['closesecret_key'])){
 	$needsecret_key=$_POST['closesecret_key'];
 	$sql="update chzb_config set value=NULL where name='secret_key'";
 	mysqli_query($GLOBALS['conn'],$sql);
-	echo"<script>showindex=4;alert('安全码验证已关闭！');</script>";
+	echo"<script>showindex=5;alert('安全码验证已关闭！');</script>";
 }
 
 //添加管理员操作
 if(isset($_POST['adminadd'])){
 	if (empty($_POST['addadminname']) || empty($_POST['addadminpsw'])) {
-	    echo"<script>showindex=5;alert('管理员的账号或是密码不能为空！');</script>";
+	    echo"<script>showindex=6;alert('管理员的账号或是密码不能为空！');</script>";
 	}else{
 		$adminname=$_POST['addadminname'];
 		$adminpsw=md5(PANEL_MD5_KEY.$_POST['addadminpsw']);
@@ -75,16 +75,16 @@ if(isset($_POST['adminadd'])){
 			if($row[0]>5){
 				unset($row);
 				mysqli_free_result($result);
-				echo"<script>showindex=5;alert('管理员数量已达上限！');</script>"; 
+				echo"<script>showindex=6;alert('管理员数量已达上限！');</script>"; 
 			}else{
 			$result=mysqli_query($GLOBALS['conn'],"select * from chzb_admin where name='$adminname'");
 				if(mysqli_fetch_array($result)){
 					unset($row);
 					mysqli_free_result($result);
-					echo"<script>showindex=5;alert('用户名已存在！');</script>"; 
+					echo"<script>showindex=6;alert('用户名已存在！');</script>"; 
 				}else{
 					mysqli_query($GLOBALS['conn'],"INSERT into chzb_admin (name,psw) values ('$adminname','$adminpsw')");
-					echo"<script>showindex=5;alert('管理员添加成功！');</script>"; 
+					echo"<script>showindex=6;alert('管理员添加成功！');</script>"; 
 				}
 			}
 		}
@@ -94,17 +94,17 @@ if(isset($_POST['adminadd'])){
 //删除账号操作
 if(isset($_POST['deleteadmin'])){	
 	if (empty($_POST['adminname'])) {
-	    echo"<script>showindex=5;alert('请选择要删除的帐号！');</script>";
+	    echo"<script>showindex=6;alert('请选择要删除的帐号！');</script>";
 	}else {
 	    foreach ($_POST['adminname'] as $name) {
 			if($name<>'admin'){
 				mysqli_query($GLOBALS['conn'],"delete from chzb_admin where name='$name'");
-				echo"<script>showindex=5;alert('管理员[$name]已删除！');</script>";
+				echo"<script>showindex=6;alert('管理员[$name]已删除！');</script>";
 			}else{
 				if ($name=="admin") {
-				    echo"<script>showindex=5;alert('超级管理员[$name]不允许删除！');</script>";
+				    echo"<script>showindex=6;alert('超级管理员[$name]不允许删除！');</script>";
 				}else {
-				    echo"<script>showindex=5;alert('删除失败！');</script>";
+				    echo"<script>showindex=6;alert('删除失败！');</script>";
 				}
 			}
 		}
@@ -140,9 +140,9 @@ if(isset($_POST['saveauthorinfo'])){
 				mysqli_query($GLOBALS['conn'],"UPDATE chzb_admin set channeladmin=1 where name='$adminname'");
 			}
 		}
-		echo"<script>showindex=5;alert('管理员权限设定已保存！');</script>";
+		echo"<script>showindex=6;alert('管理员权限设定已保存！');</script>";
 	}else{
-		echo"<script>showindex=5;alert('请选择管理员！');</script>";
+		echo"<script>showindex=6;alert('请选择管理员！');</script>";
 	}
 }
 
@@ -186,6 +186,16 @@ if(isset($_POST['submittipset'])){
 	echo"<script>showindex=2;alert('提示信息已修改！');</script>";
 }
 
+if(isset($_POST['weaapi_id'])&&isset($_POST['weaapi_key'])){
+	$weaapi_id=$_POST['weaapi_id'];$weaapi_key=$_POST['weaapi_key'];
+	if (empty($weaapi_id)) {echo("<script>showindex=0;alert('请填写天气APP_ID！');</script>");}
+	else if (empty($weaapi_key)) {echo("<script>showindex=0;alert('请填写天气APP_KEY！');</script>");}
+	if (isset($_POST['showwea'])){$showwea=1;}else{$showwea=0;}
+	set_config('showwea',"$showwea");
+	set_config('weaapi_id',"$weaapi_id");
+	set_config('weaapi_key',"$weaapi_key");
+}
+
 if(isset($_POST['submit'])&&isset($_POST['adtext'])){
 	$adtext=$_POST['adtext'];
 	$showtime=$_POST['showtime'];
@@ -195,6 +205,14 @@ if(isset($_POST['submit'])&&isset($_POST['adtext'])){
 	$sql="update chzb_appdata set adtext='$adtext',showtime=$showtime,showinterval=$showinterval,qqinfo='$qqinfo',showwea=$showwea";
 	mysqli_query($GLOBALS['conn'],$sql);
 	echo"<script>showindex=0;alert('公告修改成功！');</script>";
+}
+
+if(isset($_POST['submitappinfo'])){
+	$app_sign=$_POST['app_sign'];$app_appname=$_POST['app_appname'];$app_packagename=$_POST['app_packagename'];
+	set_config('app_sign',"$app_sign");
+	set_config('app_appname',"$app_appname");
+	set_config('app_packagename',"$app_packagename");
+	echo"<script>showindex=2;alert('保存成功！');</script>";
 }
 
 $userdata="";
@@ -332,8 +350,13 @@ if(isset($_POST['submitcloseauthor'])){
 	mysqli_query($GLOBALS['conn'],"UPDATE chzb_appdata set needauthor=$needauthor");
 }
 
+if(isset($_POST['clearlog'])){
+	$result=mysqli_query($GLOBALS['conn'],"delete from chzb_adminrec");
+	echo"<script>showindex=4;alert('后台记录已清空!');</script>";
+}
+
 //初始化
-$result=mysqli_query($GLOBALS['conn'],"select dataver,appver,setver,dataurl,appurl,adtext,showtime,showinterval,splash,needauthor,decoder,buffTimeOut,tiploading,tipuserforbidden,tipuserexpired,tipusernoreg,trialdays,qqinfo,up_size,up_sets,up_text,showwea from chzb_appdata");
+$result=mysqli_query($GLOBALS['conn'],"select dataver,appver,setver,dataurl,appurl,adtext,showtime,showinterval,splash,needauthor,decoder,buffTimeOut,tiploading,tipuserforbidden,tipuserexpired,tipusernoreg,trialdays,qqinfo,up_size,up_sets,up_text from chzb_appdata");
 if($row=mysqli_fetch_array($result)){
 	$adtext=$row['adtext'];
 	$dataver=$row['dataver'];
@@ -356,10 +379,7 @@ if($row=mysqli_fetch_array($result)){
   	$up_size=$row["up_size"];
   	$up_sets=$row["up_sets"];
   	$up_text=$row["up_text"];
-	$showwea=$row['showwea'];
 
-}else{
-	$adtext="";
 }
 unset($row);
 mysqli_free_result($result);
@@ -370,7 +390,7 @@ if($needauthor==1){
 	$closeauthor="开启授权";
 }
 
-if($showwea==1){
+if(get_config('showwea')==1){
 	$showwea='checked="checked"';
 }else{
 	$showwea="";
@@ -440,6 +460,9 @@ $files = glob("../images/*.png");
 function submitForm(){
 	$("#appsetform").submit();
 }
+function weaForm(){
+	$("#weaform").submit();
+}
 
 function showli(index){
 	$(".blogbox li").hide();
@@ -456,10 +479,11 @@ function showli(index){
 			<li><a href="#" onclick="showli(0)">系统公告</a></li>
 			<li><a href="#" onclick="showli(1)">系统备份</a></li>
 			<li><a href="#" onclick="showli(2)">APP设置</a></li>
-			<li><a href="#" onclick="showli(3)">背景图片</a></li>		
-			<li><a href="#" onclick="showli(4)">修改密码</a></li>
-			<li id='adminset'><a href="#" onclick="showli(5)">管理员设置</a></li>
-			<li><a href="#" onclick="showli(6)">免责声明</a></li>
+			<li><a href="#" onclick="showli(3)">背景图片</a></li>
+			<li><a href="#" onclick="showli(4)">后台记录</a></li>		
+			<li><a href="#" onclick="showli(5)">修改密码</a></li>
+			<li id='adminset'><a href="#" onclick="showli(6)">管理员设置</a></li>
+			<li><a href="#" onclick="showli(7)">免责声明</a></li>
 		</ul>
 	</div>
 
@@ -469,7 +493,12 @@ function showli(index){
 			<li>
 				<span align="left">
 					<div class="title">系统公告</div>
-				</span>		
+				</span>
+				<form id="weaform" method="post" align="center" style="padding: 20px">
+					天气APP_ID&nbsp;&nbsp;<input type="text" name="weaapi_id" value="<?php echo get_config('weaapi_id');?>" size=15>
+					天气APP_KEY<input type="text" name="weaapi_key" size=15 value="<?php echo get_config('weaapi_key');?>" >
+					&nbsp;<input type="checkbox" name="showwea" <?php echo $showwea;?> onchange="weaForm()" />显示天气
+				</form>
 				<form method="post" align="left" style="padding: 20px">
 			          	<div class="adfont">系统公告：</div>
 						<TEXTAREA style="height: 180px;" class="adinfo"  name="adtext"><?php echo $adtext ?></TEXTAREA>
@@ -480,7 +509,6 @@ function showli(index){
 						<div style="text-align:center;vertical-align:middel;padding-top: 10px;">
 							显示时间（秒）&nbsp;&nbsp;<input type="text" name="showtime" value="<?php echo $showtime;?>" size=20>
 							显示间隔（分）<input type="text" name="showinterval" size=20 value="<?php echo $showinterval;?>" >
-							显示天气&nbsp;<input type="checkbox" name="showwea" <?php echo $showwea;?> />
 							<input type="submit" name="submit" value="&nbsp;&nbsp;保&nbsp;&nbsp;存&nbsp;&nbsp;">
 						</div>
 				</form>
@@ -508,9 +536,18 @@ function showli(index){
 				<span align="left">
 					<div class="title">APP设置</div>
 				</span>
-				<form method="post" id="appsetform">			
-					<div style="color: black;padding-top: 20px;">
-						首次启动默认解码模式：
+				<form id="weaform" method="post" align="center" style="padding: 10px">
+					应用名&nbsp;&nbsp;<input type="text" name="app_appname" value="<?php echo get_config('app_appname');?>" size=5>
+					应用包名<input type="text" name="app_packagename" size=15 value="<?php echo get_config('app_packagename');?>" >
+					应用签名<input type="text" name="app_sign" size=5 value="<?php echo get_config('app_sign');?>" >
+					<input type="submit" name="submitappinfo" value="保存">
+				</form>
+
+				<hr>
+
+				<form method="post" id="appsetform" style="padding: 10px">			
+					<div style="color: black;">
+						默认解码模式：
 						<select name="decodersel" onchange="submitForm()">
 							<?php
 							switch ($decoder) {
@@ -536,7 +573,7 @@ function showli(index){
 							}
 							?>				
 						</select>
-						&nbsp;&nbsp;&nbsp;&nbsp;首次启动默认超时跳转：
+						&nbsp;&nbsp;&nbsp;&nbsp;默认超时跳转：
 						<select name="buffTimeOut" onchange="submitForm()">
 							<?php
 							$checkString5='';
@@ -575,15 +612,16 @@ function showli(index){
 							echo "<option value='30' $checkString30 >30 秒</option>";
 							?>
 						</select>
-						&nbsp;&nbsp;首次启动试用天数：
-						<input type="text" name="trialdays" value="<?php echo $trialdays ?>" size="3">
-						<input type="submit" name="submittrialdays" value="修改">
 					</div>
 				</form>
 
-				<form method="post" align=center>			
-					<font color=blue>			
-						<input type="submit" name="submitcloseauthor" value="<?php echo $closeauthor;?>">提示：关闭授权后，APP进入时无需授权即可进入。
+				<form method="post" align=center>
+					试用天数：
+					<input type="text" name="trialdays" value="<?php echo $trialdays ?>" size="3">
+					<input type="submit" name="submittrialdays" value="修改">	
+					<font color=blue>提示：-999为永不到期。
+						<br>
+						提示：关闭后，APP进入无需授权。<input type="submit" name="submitcloseauthor" value="<?php echo $closeauthor;?>">
 						<input type="hidden" name="needauthor" value="<?php echo $needauthor;?>">
 					</font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 					<font color=red>
@@ -670,6 +708,48 @@ function showli(index){
 						<input type="file" name="splash" accept="image/png" />
 						<input type="submit" name="submitsplash" value="&nbsp;&nbsp;开始上传&nbsp;&nbsp;">
 					</form>
+			</li>
+
+			<li style="text-align: left;">
+				<span align="left">
+					<div class="title">后台记录</div>
+				</span>
+				<div style="padding: 20px;padding-top:10px;padding-bottom:30px">
+					<table border="1" bordercolor="#a0c6e5" style="border-collapse:collapse;">
+						<td width="300px" colspan="5">
+							<form method="POST">
+								<input type='submit' name='clearlog' value='清空记录'>
+							</form>
+						</td>
+						<tr>
+							<td width="100px">账号</td>
+							<td width="200px">登入IP</td>
+							<td width="200px">登入位置</td>
+							<td width="200px">登入时间</td>
+							<td width="200px">操作</td>
+						</tr>
+			
+						<?php
+						$result=mysqli_query($GLOBALS['conn'],"SELECT name,ip,loc,time,func from chzb_adminrec");
+						while ($row=mysqli_fetch_array($result)) {
+							$loguser=$row['name'];
+							$logip=$row['ip'];
+							$logloc=$row['loc'];
+							$logtime=$row['time'];
+							$logfunc=$row['func'];
+							echo "<tr>
+								<td>$loguser</td>
+								<td>$logip</td>
+								<td>$logloc</td>
+								<td>$logtime</td>
+								<td>$logfunc</td>
+							</tr>";
+						}
+						unset($row);
+						mysqli_free_result($result);
+						?>
+					</table>
+				</div>
 			</li>
 
 			<li>
@@ -777,7 +857,7 @@ function showli(index){
 					</form>
 				</center>
 			</li>
-	
+
 			<li style="text-align: left;">
 				<span align="left">
 					<div class="title">免责声明</div>

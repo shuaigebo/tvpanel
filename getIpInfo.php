@@ -2,42 +2,36 @@
 header("Content-type: text/json; charset=utf-8");
 header("Cache-Control:no-cache,must-revalidate");
 header("Pragma: no-cache");
+include_once "config.php";
 
-$ip=$_GET['ip'];
-if ($ip=='myip'){
-	if(!empty($_SERVER['HTTP_X_REAL_IP'])){$ip=$_SERVER['HTTP_X_REAL_IP'];}else{$ip=$_SERVER['REMOTE_ADDR'];}
-}
-$url="http://ip.taobao.com/service/getIpInfo.php?ip=$ip";
 
-retry:
-$curl = curl_init();
-curl_setopt($curl, CURLOPT_URL, $url);
-curl_setopt($curl, CURLOPT_TIMEOUT, 2);
-curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 5);
-curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-$curljson = curl_exec($curl);
-curl_close($curl);
-$curlobj=strtr($curljson, array("X" => ''));
-$ipobj=json_decode($curlobj);
-if(empty($ipobj->data)) {
-	$ipobj=(Object)null;
-	goto retry;
+if ($_GET['ip']=='myip'){$ip=real_ip();}else{$ip=$_GET['ip'];}
+$myurl=dirname('http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']);
+$result=mysqli_query($GLOBALS['conn'],"select value from chzb_config where name='ip_chk'");
+if ($row = mysqli_fetch_array($result)) {$ip_chk = $row['value'];}
+unset($row);
+mysqli_free_result($result);
+
+if($ip_chk=='1'){
+	echo file_get_contents("$myurl/iploc/qqzeng.php?ip=$ip");
+}else if($ip_chk=='2'){
+	echo file_get_contents("$myurl/iploc/taobao.php?ip=$ip");
 }
 
-$country=$ipobj->data->country;
-$region=$ipobj->data->region;
-$city=$ipobj->data->city;
-$isp=$ipobj->data->isp;
-$obj=(Object)null;
-if($region == '' && $city == '') {$region=$country;}
-if($region == $city) {$region=$country;}
-if(empty($region)) {$region=$country;}
-if(empty($city)) {$region=$country;$city=$ipobj->data->region;}
-if(empty($isp)) {$region=$country;$city='';$isp=$ipobj->data->region;}
-$obj->region=$region;
-$obj->city=$city . '，' ;
-$obj->isp=$isp;
-
-$json['data'] = $obj;
-echo json_encode($json,JSON_UNESCAPED_UNICODE);
+function real_ip(){
+	$real_ip = $_SERVER['REMOTE_ADDR'];
+	if (isset($_SERVER['HTTP_X_REAL_IP']) && preg_match('/^([0-9]{1,3}\.){3}[0-9]{1,3}$/', $_SERVER['HTTP_X_REAL_IP'])) {
+		$real_ip = $_SERVER['HTTP_X_REAL_IP'];
+	} elseif (isset($_SERVER['HTTP_CLIENT_IP']) && preg_match('/^([0-9]{1,3}\.){3}[0-9]{1,3}$/', $_SERVER['HTTP_CLIENT_IP'])) {
+		$real_ip = $_SERVER['HTTP_CLIENT_IP'];
+	} elseif(isset($_SERVER['HTTP_X_FORWARDED_FOR']) AND preg_match_all('#\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}#s', $_SERVER['HTTP_X_FORWARDED_FOR'], $matches)) {
+		foreach ($matches[0] AS $xip) {
+			if (!preg_match('#^(10|172\.16|192\.168)\.#', $xip)) {
+				$real_ip = $xip;
+				break;
+			}
+		}
+	}
+	return $real_ip;
+}
 ?>

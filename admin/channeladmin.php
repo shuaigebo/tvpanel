@@ -80,8 +80,9 @@ error_reporting(E_ERROR);
 $categorytype=$_GET['categorytype'];
 
 function sort_id(){
-$numCount=1;
-$result=mysqli_query($GLOBALS['conn'],"SELECT * from chzb_category order by id");
+global $categorytype;
+if ($categorytype=='default'){$numCount=1;}else{$numCount=50;}
+$result=mysqli_query($GLOBALS['conn'],"SELECT * from chzb_category where type='$categorytype' order by id");
 while ($row=mysqli_fetch_array($result)) {
 		$name=$row['name'];
 		mysqli_query($GLOBALS['conn'],"UPDATE chzb_category set id=$numCount where name='$name'");
@@ -103,6 +104,34 @@ function chk_sort_id(){
 	}
 }
 chk_sort_id();
+	
+//增加频道列表
+function add_channel_list($pd,$listurl){
+	$getlist=file_get_contents($listurl);
+	if (!empty($getlist)){
+		mysqli_query($GLOBALS['conn'],"delete from chzb_channels where category='$pd'");
+		$rows=explode("\n",$getlist);
+		foreach($rows as $row){	
+			if (strpos($row,',') !== false){
+				$ipos=strpos($row,',');	
+				$channelname=substr($row,0,$ipos);
+				$source=substr($row,$ipos+1);
+				$src2=str_replace("\"", "", $source);
+				$src2=str_replace("\'", "", $src2);
+				$src2=str_replace("}", "", $src2);
+				$src2=str_replace("{", "", $src2);
+				$src2=preg_replace("/\#[^>]*/","",$src2);
+				$src2=preg_replace("/https(.*)www.bbsok.cf[^>]*/","",$src2);
+				if($channelname!=''&&$src2!=''){
+					mysqli_query($GLOBALS['conn'],"INSERT INTO chzb_channels VALUES (null,'$channelname','$src2','$pd')");
+				}
+			}
+		}
+		unset($rows,$getlist);
+		return 0;
+	}
+	return 1;
+}
 
 if(isset($_GET['pd'])){
 	$pd=$_GET['pd'];
@@ -161,11 +190,10 @@ if(isset($_GET['pd'])){
 	if(isset($_POST['submit'])&&isset($_POST['category'])){
 		$category=$_POST['category'];
 		$cpass=$_POST['cpass'];
-		$maxindex=$_POST['maxindex'];
 		if($category==""){
 			echo "<script>alert('类别名称不能为空');</script>";
 		}else{
-			$result=mysqli_query($GLOBALS['conn'],"SELECT max(id) from chzb_category");
+			$result=mysqli_query($GLOBALS['conn'],"SELECT max(id) from chzb_category where type='$categorytype'");
 			if($row=mysqli_fetch_array($result)){			
 				if($row[0]>0){
 					$numCount=$row[0]+1;
@@ -188,7 +216,61 @@ if(isset($_GET['pd'])){
 			}
 		}
 	}
+	
+	//增加外部列表
+	if(isset($_POST['addthirdlist'])){
+		$category=$_POST['thirdlistcategory'];
+		$listurl=$_POST['thirdlisturl'];
+		if($category==""){
+			echo "<script>alert('类别名称不能为空');</script>";
+		}else{
+			$result=mysqli_query($GLOBALS['conn'],"SELECT max(id) from chzb_category where type='$categorytype'");
+			if($row=mysqli_fetch_array($result)){			
+				if($row[0]>0){
+					$numCount=$row[0]+1;
+				}
+			}
+			unset($row);
+			mysqli_free_result($result);
+			$sql = "SELECT name FROM chzb_category where name='$category'";
+			$result = mysqli_query($GLOBALS['conn'],$sql);
+			if(mysqli_fetch_array($result)){
+				mysqli_free_result($result);
+				echo "<script>showindex=$showindex;alert('该栏目已经存在');</script>";
+			}else{
+				mysqli_query($GLOBALS['conn'],"INSERT INTO chzb_category (id,name,psw,type,url) VALUES ($numCount,'$category','$cpass','$categorytype','$listurl')");
+				$result=mysqli_query($GLOBALS['conn'],"SELECT * from chzb_category where $categorytype");
+				$showindex=mysqli_num_rows($result)-1;
+				mysqli_free_result($result);
+				if (add_channel_list($category,$listurl)==0){
+					echo "<script>showindex=$showindex;alert('增加列表$category 成功');</script>";
+				}else{
+					echo "<script>showindex=$showindex;alert('增加列表$category 失败');</script>";
+					mysqli_query($GLOBALS['conn'],"delete from chzb_category where name='$category'");
+				}
+			}
+		}
+	}
 
+	//更新外部列表
+	if(isset($_POST['updatelist'])){
+		$category=$_POST['thirdlist'];
+		if($category==""){
+			echo "<script>alert('列表名不能为空');</script>";
+		}else{
+			$result=mysqli_query($GLOBALS['conn'],"SELECT * from chzb_category where $categorytype");
+			$showindex=mysqli_num_rows($result)-1;
+			mysqli_free_result($result);
+			$listurl=mysqli_query($GLOBALS['conn'],"SELECT url from chzb_category where name='$category'");
+			if($row=mysqli_fetch_array($listurl)){$listurl=$row['url'];}
+			if (add_channel_list($category,$listurl)==0){
+				echo "<script>showindex=$showindex;alert('更新列表$category 成功');</script>";
+			}else{
+				echo "<script>showindex=$showindex;alert('更新列表$category 失败');</script>";
+			}
+		}
+	}
+	
 	if(isset($_POST['submit_deltype'])&&isset($_POST['category'])){
 		$category=$_POST['category'];
 			$showindex=$_POST['showindex'];
@@ -231,8 +313,8 @@ if(isset($_GET['pd'])){
 			$id=$row['id'];
 			$preid=$id-1;
 			if($preid >= $minid){
-				mysqli_query($GLOBALS['conn'],"update chzb_category set id=id+1	where id=$preid and type='$categorytype'");	
-				mysqli_query($GLOBALS['conn'],"update chzb_category set id=id-1	where name='$category' and type='$categorytype'");
+				mysqli_query($GLOBALS['conn'],"update chzb_category set id=id+1	where id=$preid");	
+				mysqli_query($GLOBALS['conn'],"update chzb_category set id=id-1	where name='$category'");
 				unset($row);
 				mysqli_free_result($result);
 				echo "<script>showindex=$showindex-1;</script>";
@@ -250,8 +332,8 @@ if(isset($_GET['pd'])){
 			$id=$row['id'];
 			$nextid=$id+1;
 			if($nextid <= $maxid){
-				mysqli_query($GLOBALS['conn'],"update chzb_category set id=id-1	where id=$nextid and type='$categorytype'");
-				mysqli_query($GLOBALS['conn'],"update chzb_category set id=id+1	where name='$category' and type='$categorytype'");
+				mysqli_query($GLOBALS['conn'],"update chzb_category set id=id-1	where id=$nextid'");
+				mysqli_query($GLOBALS['conn'],"update chzb_category set id=id+1	where name='$category'");
 				unset($row);
 				mysqli_free_result($result);
 				echo "<script>showindex=$showindex+1;</script>";
@@ -324,12 +406,39 @@ border-right:1px solid #a0c6e5;
 border-bottom: :0px solid #a0c6e5;">
 	<table>
 		<tr>
-				<form method="post" id='autoupdate_form'>
+			<form method="post" id='autoupdate_form'>
 				<input type="hidden" name="ver" value="<?php echo ($ver+1); ?>">
 				间隔时间<input type="text" name='updateinterval' value="<?php echo $updateinterval ?>" size="5">分
 				<?php echo"<input type=\"checkbox\" name=\"autoupdate\" value=\"$autoupdate\" $checktext>自动更新"?>
 				<input type="submit" name="submit" value="&nbsp;&nbsp;保存设定&nbsp;&nbsp;"/>
 			</form>
+		</tr>
+		<br>
+		<tr>
+			<form method="post">
+				外部列表
+				<select name="thirdlist">
+					<option selected="selected" />
+						<?php $result=mysqli_query($GLOBALS['conn'],"SELECT name from chzb_category where type='$categorytype' and url is not null");
+						while ($row=mysqli_fetch_array($result)) {
+							$listname=$row['name'];
+							echo "<option>$listname</option>";
+						}
+						unset($row);
+						mysqli_free_result($result); ?>
+				</select>
+				<input type="submit" name="updatelist" value="更新列表"/>
+			</form>
+				<input type="button" name="button" value="导入列表" onclick="document.getElementById('addthirdlist').style.display='block'" />
+		</tr>
+		<tr>
+			<div style="display: none;" id="addthirdlist">
+				<form method="post">
+					新增分类<input type="text" name="thirdlistcategory" value="" size="10" />&nbsp;&nbsp;
+					列表链接<input type="text" name="thirdlisturl" value="" size="64" />
+					<input type="submit" name="addthirdlist" value="确定" onclick="{document.getElementById('addthirdlist').style.display='none';}" >
+				</form>
+			</div>
 		</tr>
 		<br>
 		<tr>
@@ -359,7 +468,11 @@ border-bottom: :0px solid #a0c6e5;">
 		<center>
 			<ul id="pdlist">
 				<?php
-					$sql = "SELECT name,psw,enable FROM chzb_category where type='$categorytype' order by id";
+					if ($categorytype=='vip'){
+						$sql = "SELECT name,psw,enable FROM chzb_category where type='$categorytype' order by id";
+					}else{
+						$sql = "SELECT name,psw,enable FROM chzb_category where type='$categorytype' or type='thirdlist' order by id";
+					}
 					$result = mysqli_query($GLOBALS['conn'],$sql);
 					$index=0;
 					while($row = mysqli_fetch_array($result)) {
@@ -387,9 +500,9 @@ border-bottom: :0px solid #a0c6e5;">
 						</li>";
 						$index++;
 					}
-	unset($row);
-	mysqli_free_result($result);
-				mysqli_close($GLOBALS['conn']);
+					unset($row);
+					mysqli_free_result($result);
+					mysqli_close($GLOBALS['conn']);
 				?>
 			</ul>
 		</center>

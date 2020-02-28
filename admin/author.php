@@ -21,7 +21,7 @@ if(isset($_POST['submitdel'])){
 		$sql="delete from chzb_users where name='$id'";
 		mysqli_query($GLOBALS['conn'],$sql);			
 	}
-	echo "选中用户信息已删除！";		
+	echo "<script>javascript:self.location=document.referrer;alert('选中用户信息已删除！');</script>";		
 }
 
 if(isset($_POST['submitauthor'])){
@@ -32,7 +32,7 @@ if(isset($_POST['submitauthor'])){
 		$sql="update chzb_users set status=1,exp=$exp,author='$administrator',authortime=$nowtime,marks='已授权' where name='$id'";
 		mysqli_query($GLOBALS['conn'],$sql);
 	}
-	echo "选中用户授权成功！";		
+	echo '<script>javascript:window.location.href="useradmin.php";alert("选中用户授权成功！");</script>';		
 }
 
 if(isset($_POST['submitauthorforever'])){
@@ -43,7 +43,7 @@ if(isset($_POST['submitauthorforever'])){
 		$sql="update chzb_users set status=999,exp=$exp,author='$administrator',authortime=$nowtime,marks='已授权' where name='$id'";
 		mysqli_query($GLOBALS['conn'],$sql);
 	}
-	echo'<script>javascript:self.location=document.referrer;alert("选中用户已授权为永不到期！")</script>';
+	echo'<script>javascript:window.location.href="useradmin.php";alert("选中用户已授权为永不到期！")</script>';
 }
 
 if(isset($_POST['submitforbidden'])){
@@ -53,8 +53,7 @@ if(isset($_POST['submitforbidden'])){
 	    foreach ($_POST['id'] as $id){
 			$exp=strtotime(date("Y-m-d"),time());
 			$administrator=$_SESSION['user'];
-			$nowtime=time();
-			$sql="update chzb_users set exp=$exp where name='$id'";
+			$sql="update chzb_users set status=0 where name='$id'";
 			mysqli_query($GLOBALS['conn'],$sql);
 		}
 		echo'<script>javascript:self.location=document.referrer;alert("选中用户已被禁止试用！")</script>';
@@ -93,12 +92,10 @@ if($row=mysqli_fetch_array($result)){
 unset($row);
 mysqli_free_result($result);
 
-$result=mysqli_query($GLOBALS['conn'],"select adtext from chzb_appdata");
+$result=mysqli_query($GLOBALS['conn'],"select needauthor,trialdays from chzb_appdata");
 if($row=mysqli_fetch_array($result)){
-	$adtext=$row['adtext'];
-	$userpsw=$row['userpsw'];
-}else{
-	$ad="";
+	$needauthor=$row['needauthor'];
+	$isfreeuser=$row["trialdays"];
 }
 unset($row);
 mysqli_free_result($result);
@@ -246,7 +243,7 @@ mysqli_free_result($result);
 		<form method="POST">
 			<?php
 			$recStart=$recCounts*($page-1);
-			$sql="select name,mac,deviceid,model,ip,region,lasttime,exp from chzb_users where status=-1 $searchparam order by $order desc limit $recStart,$recCounts";
+			$sql="select name,mac,deviceid,model,ip,region,lasttime,exp,status from chzb_users where status=-1 or status=-999 or status=0 $searchparam order by $order desc limit $recStart,$recCounts";
 			$result=mysqli_query($GLOBALS['conn'],$sql);
 			while($row=mysqli_fetch_array($result)){
 				$lasttime=date("Y-m-d H:i:s",$row['lasttime']);
@@ -256,8 +253,11 @@ mysqli_free_result($result);
 				$model=$row['model'];
 				$ip=$row['ip'];
 				$region=$row['region'];
+				$status=$row['status'];
 				$days=ceil(($row['exp']-time())/86400);
-				if($days>0){$days='剩'."$days".'天';}else{$days="已禁用";}
+				if($days>0){$days='剩'."$days".'天';}else{$days="已到期";}
+				if($status==0){$days="已禁用";}else if($status==-999){$days="永不到期";}
+				if($needauthor==0){$days="关闭授权";}
 				echo "<tr><td><input type='checkbox' value='$name' name='id[]'>".$name."</td>
 				<td>".$mac."</td>
 				<td>".$deviceid."</td>
@@ -278,13 +278,13 @@ mysqli_free_result($result);
 					授权天数<input type="text" name="exp" value="365" size="3">
 					<input type="submit" name="submitauthor" value="&nbsp;&nbsp;授&nbsp;&nbsp;权&nbsp;&nbsp;">&nbsp;&nbsp;
 					<input type="submit" name="submitauthorforever" value="&nbsp;&nbsp;永久授权&nbsp;&nbsp;">
-					&nbsp;&nbsp;&nbsp;&nbsp;
+					&nbsp;&nbsp;
 					<input type="submit" name="submitforbidden" value="&nbsp;&nbsp;禁止试用&nbsp;&nbsp;">
-					&nbsp;&nbsp;&nbsp;&nbsp;
+					&nbsp;&nbsp;
 					<input type="submit" name="submitdel" value="删除记录" onclick="return confirm('确定删除选中用户吗？')">
-					&nbsp;&nbsp;&nbsp;&nbsp;
+					&nbsp;&nbsp;
 					<input type="submit" name="submitdelonedaybefor" value="清空一天前记录" onclick="return confirm('确认清空一天前待授权信息？')"> 
-					&nbsp;&nbsp;&nbsp;&nbsp;
+					&nbsp;&nbsp;
 					<input type="submit" name="submitdelall" value="清空所有记录" onclick="return confirm('确认删除所有待授权信息？')"> 
 				</td>
 			</tr>

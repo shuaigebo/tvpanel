@@ -24,7 +24,7 @@ if(isset($_POST['login'])){
 	$sql = "SELECT `ip`,count(*) as num FROM `chzb_users` WHERE ip='$ip'";
 	$result = mysqli_query($GLOBALS['conn'],$sql);
 	if($row = mysqli_fetch_array($result)){$num=$row['num'];}
-	if($num >= MAX_SAME_IP_USER){
+	if($num >= get_config('max_sameip_user')){
 		header('HTTP/1.1 403 Forbidden');
 		mysqli_free_result($result);
 		mysqli_close($GLOBALS['conn']);
@@ -41,8 +41,8 @@ if(isset($_POST['login'])){
 		$nettype=$obj->nettype;
 		$appname=$obj->appname;
 		if(empty($region)){
-			$myurl='http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
-			$json=file_get_contents(dirname($myurl)."/getIpInfo.php?ip=$ip");
+			$myurl='http://'.$_SERVER['HTTP_HOST'];
+			$json=file_get_contents("$myurl/getIpInfo.php?ip=$ip");
 			$obj=json_decode($json);
 			$region=$obj->data->region . $obj->data->city . $obj->data->isp;
 		}
@@ -71,7 +71,7 @@ if(isset($_POST['login'])){
 		//status=-1,未授权用户
 		//status=999为永不到期
 		$nowtime=time();
-	
+
 		//androidID是否匹配
 		$sql = "SELECT name,status,exp,deviceid,model FROM chzb_users where deviceid='$androidid'";
 		$result = mysqli_query($GLOBALS['conn'],$sql);
@@ -83,6 +83,8 @@ if(isset($_POST['login'])){
 			$exp=$row["exp"];  //收视期限，时间戳
 			$status2=$status;
 			if($days>0&&$status==-1){
+				$status=1;
+			}else if($status2==-999){
 				$status=1;
 			}
 			//更新位置，登陆时间
@@ -110,8 +112,8 @@ if(isset($_POST['login'])){
 				$status=-1;
 				$marks='试用';
 			}elseif($days=="-999") {
-				$status=-1;
-				$marks='免费用户';
+				$status=-999;
+				$marks='免费';
 			}else{
 				$status=-1;
 				$marks='未授权';
@@ -119,12 +121,12 @@ if(isset($_POST['login'])){
 			$status2=$status;
 			$exp=strtotime(date("Y-m-d"),time())+86400*$days;
 			mysqli_query($GLOBALS['conn'],"INSERT into chzb_users (name,mac,deviceid,model,exp,ip,status,region,lasttime,marks) values($name,'$mac','$androidid','$model',$exp,'$ip',$status,'$region',$nowtime,'$marks')");
-			if($days>0&&$status==-1)$status=1;
+			if($days>0&&$status==-1){$status=1;}else if($status2==-999){$status=1;}
 		}
 		unset($row);
 		mysqli_free_result($result);
 	
-		$sql = "SELECT dataver,appver,setver,adtext,qqinfo,showtime,showinterval,dataurl,appurl,decoder,buffTimeOut,tiploading,tipusernoreg,tipuserexpired,tipuserforbidden,needauthor,autoupdate,randkey,updateinterval,trialdays,showwea FROM chzb_appdata";
+		$sql = "SELECT dataver,appver,setver,adtext,qqinfo,showtime,showinterval,dataurl,appurl,decoder,buffTimeOut,tiploading,tipusernoreg,tipuserexpired,tipuserforbidden,needauthor,autoupdate,randkey,updateinterval,trialdays FROM chzb_appdata";
 		$result = mysqli_query($GLOBALS['conn'],$sql);
 		if($row = mysqli_fetch_array($result)) {
 			$dataver=$row['dataver'];
@@ -149,19 +151,20 @@ if(isset($_POST['login'])){
 			$url='http://'.$_SERVER['HTTP_HOST'].$_SERVER["REQUEST_URI"]; 
 			$dataurl=dirname($url)."/data.php";
 			$appUrl=$row['appurl'];
-			$isfreeuser=$row["trialdays"];   //试用的天数   -999为免费无限期试用
 		}
 		unset($row);
 		mysqli_free_result($result);
 	
-		if($needauthor==0 || ($status==-1 && $isfreeuser=="-999") ){
+		if($needauthor==0 || ($status2==-999) ){
 			$status=999;
 		}
 
-		if($showwea==1){
-			$api_id=WEATHER_API_ID;
-			$api_key=WEATHER_API_KEY;
-			$url="https://www.tianqiapi.com/api?version=v6&appid=$api_id&appsecret=$api_key&ip=$ip";
+		if(get_config('showwea')==1){
+			$weaapi_id=get_config('weaapi_id');
+			$weaapi_key=get_config('weaapi_key');
+			unset($row);
+			mysqli_free_result($result);
+			$url="https://www.tianqiapi.com/api?version=v6&appid=$weaapi_id&appsecret=$weaapi_key&ip=$ip";
 			$curl = curl_init();
 			curl_setopt($curl, CURLOPT_URL, $url);
 			curl_setopt($curl, CURLOPT_TIMEOUT, 2);
@@ -170,8 +173,10 @@ if(isset($_POST['login'])){
 			$curljson = curl_exec($curl);
 			curl_close($curl);
 			$obj=json_decode($curljson);
-			$weather=date('n月d号') .$obj->week . '，' . $obj->city . '，' . $obj->tem . '℃'  . $obj->wea . '，' . '气温:' . $obj->tem2  . '℃' .'～' . $obj->tem1 . '℃' . '，' . $obj->win . $obj->win_speed . '，' . '相对湿度:' . $obj->humidity . '，' . '空气质量:' .  $obj->air_level . '，' . $obj->air_tips ;
-			$adtext=$weather . $adtext;
+			if(!empty($obj->city)){
+				$weather=date('n月d号') . $obj->week . '，' . $obj->city . '，' . $obj->tem . '℃'  . $obj->wea . '，' . '气温:' . $obj->tem2  . '℃' .'～' . $obj->tem1 . '℃' . '，' . $obj->win . $obj->win_speed . '，' . '相对湿度:' . $obj->humidity . '，' . '空气质量:' .  $obj->air_level . '，' . $obj->air_tips ;
+				$adtext=$weather . $adtext;
+			}
 		}
 		
 		if($status<1){

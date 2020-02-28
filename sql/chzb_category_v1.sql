@@ -1,17 +1,3 @@
---
--- MySQL database dump
--- Created by DbManage class, Power By yanue. 
--- http://yanue.net 
---
--- 生成日期: 2020 年  02 月 19 日 20:05
--- MySQL版本: 5.5.62-log
--- PHP 版本: 7.2.25
-
---
--- 数据库: ``
---
-
--- -------------------------------------------------------
 
 --
 -- 表的结构chzb_category
@@ -24,6 +10,7 @@ CREATE TABLE `chzb_category` (
   `enable` tinyint(4) NOT NULL DEFAULT '1',
   `psw` varchar(16) DEFAULT '',
   `type` varchar(16) NOT NULL DEFAULT 'default',
+  `url` varchar(1024) DEFAULT NULL,
   UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -31,5 +18,7 @@ CREATE TABLE `chzb_category` (
 -- 转存表中的数据 chzb_category
 --
 
-INSERT INTO `chzb_category` VALUES('1','默认频道','1','','default');
-INSERT INTO `chzb_category` VALUES('2','隐藏频道','1','','vip');
+INSERT INTO `chzb_category` VALUES('1','默认频道','1','','default','');
+INSERT INTO `chzb_category` VALUES('2','HomeNET','1','','default','https://homenet6.github.io/nj.txt');
+INSERT INTO `chzb_category` VALUES('3','Sason','1','','default','https://raw.githubusercontent.com/sasoncheung/iptv/master/all.txt');
+INSERT INTO `chzb_category` VALUES('50','隐藏频道','1','','vip','');

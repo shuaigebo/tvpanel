@@ -1,15 +1,3 @@
---
--- MySQL database dump
--- Created by DbManage class, Power By yanue. 
--- http://yanue.net 
---
--- 生成日期: 2020 年  02 月 19 日 20:37
--- MySQL版本: 5.5.62-log
--- PHP 版本: 7.2.25
-
---
--- 数据库: ``
---
 
 -- -------------------------------------------------------
 
@@ -45,7 +33,6 @@ CREATE TABLE `chzb_appdata` (
   `up_size` varchar(16) DEFAULT NULL,
   `up_sets` int(11) NOT NULL,
   `up_text` varchar(1024) DEFAULT NULL,
-  `showwea` int(11) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 
@@ -53,4 +40,4 @@ CREATE TABLE `chzb_appdata` (
 -- 转存表中的数据 chzb_appdata
 --
 
-INSERT INTO `chzb_appdata` VALUES('1','2','2.0','1','http://127.0.0.1','http://127.0.0.1/1.apk','','120','5','1','http://127.0.0.1/bg.png','1','30','请输入授权码登录，或联系公众号客服@luo2888的工作室。','账号已到期，请联系公众号客服@luo2888的工作室续费。','账号已禁用，请联系公众号客服@luo2888的工作室。','正在连接，请稍后 ...','2','365','欢迎关注微信公众号@luo2888的工作室','1','827ccb0eea8a706c4c34a16891f84e7b','10','','1','','0');
+INSERT INTO `chzb_appdata` VALUES('1','2','1.0','1','http://127.0.0.1','http://127.0.0.1/1.apk','','120','5','1','http://127.0.0.1/bg.png','1','30','该设备无授权，请联系公众号客服@luo2888的工作室。','账号已到期，请联系公众号客服@luo2888的工作室续费。','账号已禁用，请联系公众号客服@luo2888的工作室。','正在连接，请稍后 ...','2','-999','欢迎关注微信公众号@luo2888的工作室','1','827ccb0eea8a706c4c34a16891f84e7b','10','','1','');
