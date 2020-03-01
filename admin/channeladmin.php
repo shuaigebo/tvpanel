@@ -111,19 +111,52 @@ function add_channel_list($pd,$listurl){
 	if (!empty($getlist)){
 		mysqli_query($GLOBALS['conn'],"delete from chzb_channels where category='$pd'");
 		$rows=explode("\n",$getlist);
-		foreach($rows as $row){	
-			if (strpos($row,',') !== false){
-				$ipos=strpos($row,',');	
+		$rows=preg_replace('# #','',$rows);
+		$rows=preg_replace('/高清/', '', $rows);
+		$rows=preg_replace('/FHD/', '', $rows);
+		$rows=preg_replace('/HD/', '', $rows);
+		$rows=preg_replace('/SD/', '', $rows);
+		$rows=preg_replace('/\[.*?\]/', '', $rows);
+		$rows=preg_replace('/\#genre\#/', '', $rows);
+		$rows=preg_replace('/ver\..*?\.m3u8/', '', $rows);
+		$rows=preg_replace('/t\.me.*?\.m3u8/', '', $rows);
+		$rows=preg_replace("/https(.*)www.bbsok.cf[^>]*/","",$rows);
+		foreach($rows as $row){
+			if (strpos($row, ',') !== false){
+				$ipos=strpos($row, ',');	
 				$channelname=substr($row,0,$ipos);
 				$source=substr($row,$ipos+1);
-				$src2=str_replace("\"", "", $source);
-				$src2=str_replace("\'", "", $src2);
-				$src2=str_replace("}", "", $src2);
-				$src2=str_replace("{", "", $src2);
-				$src2=preg_replace("/\#[^>]*/","",$src2);
-				$src2=preg_replace("/https(.*)www.bbsok.cf[^>]*/","",$src2);
-				if($channelname!=''&&$src2!=''){
-					mysqli_query($GLOBALS['conn'],"INSERT INTO chzb_channels VALUES (null,'$channelname','$src2','$pd')");
+				if(strpos($source,'#')!==false){
+					$sources=explode("#",$source);
+					foreach ($sources as $src) {
+						$src2=str_replace("\"", "", $src);
+						$src2=str_replace("\'", "", $src2);
+						$src2=str_replace("}", "", $src2);
+						$src2=str_replace("{", "", $src2);
+						$channelurl=mysqli_query($GLOBALS['conn'],"SELECT url from chzb_channels order by id");
+						while ($url=mysqli_fetch_array($channelurl)) {
+							if($src2 == $url['url']){$src2='';}
+						}
+						unset($url);
+						mysqli_free_result($channelurl);
+						if($channelname!=''&&$src2!=''){
+							mysqli_query($GLOBALS['conn'],"INSERT INTO chzb_channels VALUES (null,'$channelname','$src2','$pd')");
+						}
+					}
+				}else{
+					$src2=str_replace("\"", "", $source);
+					$src2=str_replace("\'", "", $src2);
+					$src2=str_replace("}", "", $src2);
+					$src2=str_replace("{", "", $src2);
+					$channelurl=mysqli_query($GLOBALS['conn'],"SELECT url from chzb_channels order by id");
+					while ($url=mysqli_fetch_array($channelurl)) {
+						if($src2 == $url['url']){$src2='';}
+					}
+					unset($url);
+					mysqli_free_result($channelurl);
+					if($channelname!=''&&$src2!=''){
+						mysqli_query($GLOBALS['conn'],"INSERT INTO chzb_channels VALUES (null,'$channelname','$src2','$pd')");
+					}
 				}
 			}
 		}
@@ -156,7 +189,7 @@ if(isset($_GET['pd'])){
 		
 		mysqli_query($GLOBALS['conn'],"delete from chzb_channels where category='$pd'");
 		$rows=explode("\r\n",$srclist);
-		foreach($rows as $row){	
+		foreach($rows as $row){
 			if (strpos($row, ',') !== false){
 				$ipos=strpos($row, ',');	
 				$channelname=substr($row,0,$ipos);

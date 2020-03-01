@@ -131,7 +131,6 @@ if(isset($_POST['login'])){
 		if($row = mysqli_fetch_array($result)) {
 			$dataver=$row['dataver'];
 			$appver=$row['appver']; 
-			$setver=$row['showwea'];
 			$setver=$row['setver'];
 			$adtext=$row['adtext'];
 			$qqinfo=$row['qqinfo'];
@@ -183,7 +182,7 @@ if(isset($_POST['login'])){
 			$dataurl='';
 			$appUrl='';
 		}
-	
+
 		$objres= array('status' => $status, 'dataurl'=>$dataurl,'appurl'=>$appUrl,'dataver' =>$dataver,'appver'=>$appver,'setver'=>$setver,'adtext'=>$adtext,'showinterval'=>$showinterval,'categoryCount'=>0,'exp' => $days,'ip'=>$ip,'showtime'=>$showtime ,'id'=>$name,'decoder'=>$decoder,'buffTimeOut'=>$buffTimeOut,'tipusernoreg'=>$tipusernoreg,'tiploading'=>$tiploading,'tipuserforbidden'=>$tipuserforbidden,'tipuserexpired'=>$tipuserexpired,'qqinfo'=>$qqinfo,'arrsrc'=>$src,'location'=>$region,'nettype'=>$nettype,'autoupdate'=>$autoupdate,'updateinterval'=>$updateinterval,'randkey'=>$randkey,'exps'=>$exp,'stus'=>$status2);
 		$objres=str_replace("\\/", "/", json_encode($objres,JSON_UNESCAPED_UNICODE));
 		$key=substr($key,5,16);

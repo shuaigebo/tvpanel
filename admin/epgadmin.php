@@ -364,7 +364,7 @@ function quanxuan(a){
 			</form>
 		    <form method="POST">
 				极速数据API_KEY&nbsp;<input type="text" name="jisuapi_key" size=15 value="<?php echo get_config('jisuapi_key');?>" >
-				&nbsp;EPG接口验证&nbsp;<input type="checkbox" name="epg_api_chk" <?php echo $epg_api_chk;?> />
+				&nbsp;EPG接口验证&nbsp;<input type="checkbox" name="epg_api_chk" onclick="alert('注意：非专用客户端打开后EPG会将不显示！');" <?php echo $epg_api_chk;?> />
 				<input type="submit" name="submit" value="&nbsp;保&nbsp;&nbsp;存&nbsp;">
 			</form>
 		</td>

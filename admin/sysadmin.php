@@ -611,16 +611,17 @@ function showli(index){
 							echo "<option value='25' $checkString25 >25 秒</option>";
 							echo "<option value='30' $checkString30 >30 秒</option>";
 							?>
-						</select>
+						</select>&nbsp;&nbsp;
+						试用天数：
+						<input type="text" name="trialdays" value="<?php echo $trialdays ?>" size="3">
+						<input type="submit" name="submittrialdays" value="修改">	
+						<font color=blue>提示：-999为永不到期。</font>
 					</div>
 				</form>
 
+				<br>
+
 				<form method="post" align=center>
-					试用天数：
-					<input type="text" name="trialdays" value="<?php echo $trialdays ?>" size="3">
-					<input type="submit" name="submittrialdays" value="修改">	
-					<font color=blue>提示：-999为永不到期。
-						<br>
 						提示：关闭后，APP进入无需授权。<input type="submit" name="submitcloseauthor" value="<?php echo $closeauthor;?>">
 						<input type="hidden" name="needauthor" value="<?php echo $needauthor;?>">
 					</font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;

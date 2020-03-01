@@ -1,5 +1,6 @@
 <meta charset="UTF-8"> <!-- for HTML5 -->
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="renderer" content="webkit" />
 <title>IPTV管理平台</title>
 <?php
 include_once "../config.php";include_once "usercheck.php";

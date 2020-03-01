@@ -112,7 +112,7 @@ if(isset($_GET['order'])){
 	$order='lasttime';
 }
 
-$result=mysqli_query($GLOBALS['conn'],"select count(*) from chzb_users where status=-1");
+$result=mysqli_query($GLOBALS['conn'],"select count(*) from chzb_users where status=-1 or status=-999 or status=0");
 if($row=mysqli_fetch_array($result)){
 	$userCount=$row[0];
 	$pageCount=ceil($row[0]/$recCounts);
@@ -131,7 +131,7 @@ if(isset($_POST['jumpto'])){
 }
 
 $todayTime=strtotime(date("Y-m-d"),time());
-$result=mysqli_query($GLOBALS['conn'],"select count(*) from chzb_users where status=-1 and lasttime>$todayTime");
+$result=mysqli_query($GLOBALS['conn'],"select count(*) from chzb_users where status=-1 or status=-999 or status=0 and lasttime>$todayTime");
 if($row=mysqli_fetch_array($result)){
 	$todayuserCount=$row[0];
 }else{
@@ -140,7 +140,7 @@ if($row=mysqli_fetch_array($result)){
 unset($row);
 mysqli_free_result($result);
 
-$result=mysqli_query($GLOBALS['conn'],"select count(*) from chzb_users where status>-1 and authortime>$todayTime");
+$result=mysqli_query($GLOBALS['conn'],"select count(*) from chzb_users where status>0 and authortime>$todayTime");
 if($row=mysqli_fetch_array($result)){
 	$todayauthoruserCount=$row[0];
 }else{

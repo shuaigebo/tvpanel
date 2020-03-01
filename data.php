@@ -52,7 +52,7 @@ if(isset($_POST['data'])){
     	$isvip = '0';
 	}
 	
-	$contents[]= echoJSON($pdname,"我的收藏",''); 
+	$contents[]= echoJSON('',"我的收藏",''); 
 
 	//添加默认频道
 	$sql = "SELECT name,id,psw FROM chzb_category where enable=1 and type='default' order by id";
