@@ -1,8 +1,10 @@
 # 骆驼IPTV管理后台
 
-- 新增EPG支持
+- 新增天气显示
 - 兼容PHP7
-- 去除无用的功能和代码
+- 新增外部列表导入
+- 支持在后台直接修改对接的apk接口
+- 新增管理员登录操作记录
 
 ## 面板安装
 - 下载代码
@@ -38,6 +40,8 @@ $db_database="";  //数据库名称
 ```
 http://{域名}/
 ```
+## 开源项目为骆驼IPTV魔改版，如需本人自用最新IPTV管理后台请联系微信
+![image](https://github.com/GaHoKwan/tvpanel/raw/master/QQ%E6%88%AA%E5%9B%BE20200303045506.png)
 
 ## 捐赠
 ![image](https://github.com/GaHoKwan/tvpanel/raw/master/wechat-pay.png)
