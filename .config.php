@@ -13,7 +13,7 @@ global $conn;
 mysqli_query($GLOBALS['conn'],"SET NAMES 'UTF8'");
 
 function get_config($name){
-	$result=mysqli_query($GLOBALS['conn'],"SELECT value from luo2888_config where name='$name'");
+	$result=mysqli_query($GLOBALS['conn'],"SELECT value from chzb_config where name='$name'");
 	if($row=mysqli_fetch_array($result)){$return=$row['value'];}else{echo '<script>alert("数据库错误！");</script>';}
 	unset($row);
 	mysqli_free_result($result);
@@ -21,7 +21,7 @@ function get_config($name){
 }
 
 function set_config($name,$value){
-	mysqli_query($GLOBALS['conn'],"UPDATE luo2888_config set value='$value' where name='$name'");
+	mysqli_query($GLOBALS['conn'],"UPDATE chzb_config set value='$value' where name='$name'");
 }
 function getuserip(){
 	$real_ip = $_SERVER['REMOTE_ADDR'];
