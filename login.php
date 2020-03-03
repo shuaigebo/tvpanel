@@ -20,7 +20,7 @@ if (isset($_GET['id'])) {
 
 if(isset($_POST['login'])){
 
-	if(!empty($_SERVER['HTTP_X_REAL_IP'])){$ip=$_SERVER['HTTP_X_REAL_IP'];}else{$ip=$_SERVER['REMOTE_ADDR'];}
+	$ip=getuserip();
 	$sql = "SELECT `ip`,count(*) as num FROM `chzb_users` WHERE ip='$ip'";
 	$result = mysqli_query($GLOBALS['conn'],$sql);
 	if($row = mysqli_fetch_array($result)){$num=$row['num'];}
@@ -40,6 +40,7 @@ if(isset($_POST['login'])){
 		$model=$obj->model;
 		$nettype=$obj->nettype;
 		$appname=$obj->appname;
+		if ($ip=='' || $ip=='127.0.0.1') {$ip='127.0.0.1';$region='localhost';}
 		if(empty($region)){
 			$myurl='http://'.$_SERVER['HTTP_HOST'];
 			$json=file_get_contents("$myurl/getIpInfo.php?ip=$ip");
