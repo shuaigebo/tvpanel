@@ -8,11 +8,16 @@ if($_SESSION['secret_key_status']!="1"){
 }
 include_once "../config.php";
 
-if(!empty($_SERVER['HTTP_X_REAL_IP'])){$ip=$_SERVER['HTTP_X_REAL_IP'];}else{$ip=$_SERVER['REMOTE_ADDR'];}
-$myurl='http://'.$_SERVER['HTTP_HOST'];
-$json=file_get_contents("$myurl/getIpInfo.php?ip=$ip");
-$obj=json_decode($json);
-$region=$obj->data->region . $obj->data->city . $obj->data->isp;
+$ip=getuserip();
+if ($ip='' || $ip='127.0.0.1') {
+	$ip='127.0.0.1';
+	$region='localhost';
+} else {
+    $myurl = 'http://' . $_SERVER['HTTP_HOST'];
+    $json = file_get_contents("$myurl/getIpInfo.php?ip=$ip");
+    $obj = json_decode($json);
+    $region = $obj->data->region . $obj->data->city . $obj->data->isp;
+} 
 $time=date("Y-m-d H:i:s");
 
 if(!empty($_POST['username'])&& !empty($_POST['password'])){
