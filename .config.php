@@ -4,9 +4,9 @@ header("Content-type: text/html; charset=utf-8");
 define("PANEL_MD5_KEY","tvkey_");  //面板密码MD5加密秘钥
 
 $db_host="localhost";  //数据库服务器
-$db_user="tvdbuser";  //数据库帐号
-$db_pwd="tvdbpasswd";   //数据库密码
-$db_database="tvpanel";  //数据库名称
+$db_user="";  //数据库帐号
+$db_pwd="";   //数据库密码
+$db_database="";  //数据库名称
 $conn=mysqli_connect($db_host,$db_user,$db_pwd,$db_database) OR die ('无法登录MYSQL服务器！');  //连接数据库对象
 
 global $conn;

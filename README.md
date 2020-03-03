@@ -40,7 +40,7 @@ $db_database="";  //数据库名称
 ```
 http://{域名}/
 ```
-## 开源项目为骆驼IPTV魔改版，如需本人自用最新IPTV管理后台请联系微信购买
+## 开源项目为骆驼IPTV魔改版，如需以下最新IPTV管理后台请联系微信购买
 ![image](https://github.com/GaHoKwan/tvpanel/raw/master/image.png)
 
 ## 捐赠
