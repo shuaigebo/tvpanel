@@ -94,6 +94,7 @@ if(isset($_COOKIE['remembersecret_key'])){
             }
 		</script>
 	</head>
+	<center>
 	<body onload="startTime()">
 		当前时间：<font color="#0D0D0D"><span id="nowDateTimeSpan"></span></font>
 		<br><br>
@@ -103,4 +104,5 @@ if(isset($_COOKIE['remembersecret_key'])){
 			<input type="submit" name="secret_key_enter" value="&nbsp;&nbsp;&nbsp;进入后台&nbsp;&nbsp;&nbsp;"/>
 		</form>
 	</body>
+	</center>
 </html>
