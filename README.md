@@ -40,13 +40,3 @@ $db_database="";  //数据库名称
 ```
 http://{域名}/
 ```
-
-## 客户讨论QQ群：807073464
-
-## 捐赠
-![image](https://github.com/GaHoKwan/tvpanel/raw/master/wechat-pay.png)
-
-## 客户端对接（提示：骆驼壳 login3.php -> login.php）
-- 无教程，如需指导搭建或需要专用客户端，请扫码联系微信购买。
-
-![image](https://github.com/GaHoKwan/tvpanel/raw/master/wechat.jpeg)
